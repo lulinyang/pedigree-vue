@@ -2,12 +2,12 @@
   <div>
     <el-card class="box-card" style="width: 100%;">
       <div slot="header" class="clearfix">
-        <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form :inline="true" :model="keywords" class="demo-form-inline">
           <el-form-item label="名称">
-            <el-input v-model="formInline.username" placeholder="请名称"></el-input>
+            <el-input v-model="keywords.name" placeholder="请名称"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">查询</el-button>
+            <el-button type="primary" @click="search()">查询</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -26,15 +26,20 @@
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
-              <el-button type="primary" @click="showModal(scope.row)">编辑</el-button>
+              <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
               <el-button type="success" @click="showPower(scope.row)">分配权限</el-button>
-              <el-button type="danger">删除</el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
       <div style="text-align: center;padding-top: 20px">
-        <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
+        <el-pagination 
+          background 
+          layout="prev, pager, next" 
+          :total="total" 
+          :page-size="8"
+          @current-change="changeCurrent"></el-pagination>
       </div>
     </el-card>
 
@@ -79,9 +84,9 @@ export default {
   data() {
     return {
       rolelist: [],
-      formInline: {
-        username: "",
-        email: ""
+      keywords: {
+        name: "",
+        page: 1
       },
       role: {
         pid: 0
@@ -95,22 +100,28 @@ export default {
       defaultProps: {
         children: "children",
         label: "name"
-      }
+      },
+      total: 0
     };
   },
   created() {
     this.getList();
   },
   methods: {
-    onSubmit() {
-      console.log("submit!");
+    search() {
+      this.getList();
+    },
+     changeCurrent(page) {
+      this.keywords.page = page;
+      this.getList();
     },
     getList() {
       const that = this;
       http
-        .getRoles({})
+        .getRoles(that.keywords)
         .then(res => {
           that.rolelist = res.data.data;
+          that.total = res.data.total;
         })
         .catch(res => {});
     },
@@ -128,7 +139,6 @@ export default {
                 this.$message.success("新增成功！");
               } else if (res.data.original && res.data.original.updated) {
                 that.isShow = false;
-                that.getList();
                 this.$message.success("修改成功！");
               } else if (res.data.original && res.data.original.find) {
                 this.$message.error("角色名重复！");
@@ -145,7 +155,6 @@ export default {
       this.isShow = true;
     },
     showPower(item) {
-      console.log("item", item);
       this.role = item ? item : {};
       const that = this;
       http
@@ -176,11 +185,37 @@ export default {
         .then(res => {
           if (res.data.original && res.data.original.updated) {
             this.isShowPower = false;
+            this.keywords.page = 1;
             that.getList();
             this.$message.success("操作成功！");
           }
         })
         .catch(res => {});
+    },
+     showDel(item) {
+      this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.deleteRole(item);
+        })
+        .catch(() => {
+          this.$message.info("已取消删除!");
+        });
+    },
+    deleteRole(item) {
+      http.deleteRole({id: item.id}).then(res => {
+        if(res.data.result) {
+          this.$message.success(res.data.message);
+          this.getList();
+        }else {
+          this.$message.error(res.data.message);
+        }
+      }).catch(res => {
+        this.$message.error("删除失败!");
+      });
     }
   }
 };

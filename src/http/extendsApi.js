@@ -8,7 +8,8 @@ class axiosApi {
 
 	sendGet(url, params = {}) { // get 请求
 		if (Object.prototype.toString.call(params) === '[object Object]') {
-			return api.creatAxios.get(url + '?' + qs.stringify(params))
+      var param =  qs.stringify(params) !== '' ? '?' + qs.stringify(params) : qs.stringify(params);
+			return api.creatAxios.get(url + param)
 		} else {
 			const error = new Error('参数错误！')
 			try {

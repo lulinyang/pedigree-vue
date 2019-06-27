@@ -1,16 +1,6 @@
 <template>
   <div>
     <el-card class="box-card" style="width: 100%;">
-      <div slot="header" class="clearfix">
-        <el-form :inline="true" :model="formInline" class="demo-form-inline">
-          <el-form-item label="名称">
-            <el-input v-model="formInline.username" placeholder="请名称"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="onSubmit">查询</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
       <el-row>
         <el-col :span="24">
           <div class="grid-content bg-purple-dark">
@@ -19,22 +9,26 @@
         </el-col>
       </el-row>
       <div>
-        <el-table :data="nodelist" border style="width: 100%">
+        <el-table
+          :data="nodelist"
+          style="width: 100%;margin-bottom: 20px;"
+          row-key="id"
+          border
+          default-expand-all
+          :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        >
           <el-table-column prop="name" label="名称" width="180"></el-table-column>
-          <el-table-column prop="router" label="路由"></el-table-column>
-          <el-table-column prop="description" label="描述"></el-table-column>
+          <el-table-column prop="router" label="路由" width="180"></el-table-column>
+          <el-table-column prop="description" label="描述" width="180"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" width="180">
             <template slot-scope="scope">
-              <el-button type="primary" @click="showModal(scope.row)">编辑</el-button>
-              <el-button type="danger">删除</el-button>
+              <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
-      </div>
-      <div style="text-align: center;padding-top: 20px">
-        <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
       </div>
     </el-card>
 
@@ -52,7 +46,12 @@
         <el-form-item label="父节点">
           <el-select v-model="nodes.pidLevel" filterable placeholder="请选择节点层级">
             <el-option label="顶级节点" value="0-0"></el-option>
-            <el-option v-for="item in nodeAll" :key="item.id" :label="item.name" :value="item.id + '-' +  (parseInt(item.level) + 1)"></el-option>
+            <el-option
+              v-for="item in nodeAll"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id + '-' +  (parseInt(item.level) + 1)"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -71,31 +70,25 @@ export default {
   data() {
     return {
       nodelist: [],
-      formInline: {
-        username: "",
-        email: ""
-      },
       nodes: {},
       isShow: false,
       rules: {
         name: [{ required: true, message: "请输入节点名", trigger: "blur" }]
       },
-      nodeAll: []
+      nodeAll: [],
+      total: 0
     };
   },
   created() {
     this.getList();
   },
   methods: {
-    onSubmit() {
-      console.log("submit!");
-    },
     getList() {
       const that = this;
       http
-        .getNodes({})
+        .getNodesGetTree({})
         .then(res => {
-          that.nodelist = res.data.data;
+          that.nodelist = res.data;
         })
         .catch(res => {});
     },
@@ -103,7 +96,6 @@ export default {
       const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          // console.log(formName, that.nodes);return;
           http
             .addNode(that.nodes)
             .then(res => {
@@ -113,7 +105,6 @@ export default {
                 this.$message.success("新增成功！");
               } else if (res.data.original && res.data.original.updated) {
                 that.isShow = false;
-                that.getList();
                 this.$message.success("修改成功！");
               } else {
                 this.$message.error("添加失败！");
@@ -124,12 +115,12 @@ export default {
       });
     },
     showModal(item) {
-      this.nodes = item ? item : { pidLevel: '0-0' };
-      if(item) {
-        item.pidLevel = item.pid + '-' + item.level;
+      this.nodes = item ? item : { pidLevel: "0-0" };
+      if (item) {
+        item.pidLevel = item.pid + "-" + item.level;
         this.nodes = item;
-      }else {
-        this.nodes = { pidLevel: '0-0' }
+      } else {
+        this.nodes = { pidLevel: "0-0" };
       }
       this.isShow = true;
       const that = this;
@@ -139,6 +130,37 @@ export default {
           that.nodeAll = res.data;
         })
         .catch(res => {});
+    },
+    showDel(item) {
+      this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          if(item.children.length > 0) {
+            this.$message.warning("此节点还有子节点，不能删除!");
+            return false;
+          }
+          this.deleteNode(item);
+          // this.$message.success("删除成功!");
+        })
+        .catch(() => {
+          this.$message.info("已取消删除!");
+        });
+    },
+    deleteNode(item) {
+      http.deleteNode({id: item.id}).then(res => {
+        console.log('success', res);
+        if(res.data.result) {
+          this.$message.success(res.data.message);
+          this.getList();
+        }else {
+          this.$message.error(res.data.message);
+        }
+      }).catch(res => {
+        this.$message.error("删除失败!");
+      });
     }
   }
 };

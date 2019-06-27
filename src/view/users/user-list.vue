@@ -23,8 +23,9 @@
       </el-row>
       <div>
         <el-table :data="userlist" border style="width: 100%">
-          <el-table-column prop="username" label="姓名" width="180"></el-table-column>
-          <el-table-column prop="email" label="邮箱"></el-table-column>
+          <el-table-column prop="username" label="姓名" width="150"></el-table-column>
+          <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
+          <el-table-column prop="orgname" label="机构名" width="180"></el-table-column>
           <el-table-column prop="rolen_ame" label="角色"></el-table-column>
           <el-table-column prop="login_at" label="上次登录时间"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
@@ -32,13 +33,19 @@
           <el-table-column label="操作" width="180">
             <template slot-scope="scope">
               <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
-              <el-button type="danger" icon="el-icon-delete">删除</el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
       <div style="text-align: center;padding-top: 20px">
-        <el-pagination background layout="prev, pager, next" :total="total" @current-change="changeCurrent"></el-pagination>
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="total"
+          :page-size="8"
+          @current-change="changeCurrent"
+        ></el-pagination>
       </div>
     </el-card>
 
@@ -46,6 +53,9 @@
       <el-form ref="formUser" :model="user" :rules="rules" label-width="120px">
         <el-form-item label="用户名" prop="username" style="width: 350px;">
           <el-input v-model="user.username"></el-input>
+        </el-form-item>
+        <el-form-item label="机构名" style="width: 350px;">
+          <el-input v-model="user.orgname"></el-input>
         </el-form-item>
         <el-form-item label="邮箱" prop="email" style="width: 350px;">
           <el-input v-model="user.email"></el-input>
@@ -55,12 +65,7 @@
         </el-form-item>
         <el-form-item label="角色" prop="role_id" style="width: 350px;">
           <el-select v-model="user.role_id" filterable placeholder="请选择">
-            <el-option
-              v-for="item in roles"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
+            <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -86,13 +91,14 @@ export default {
       user: {},
       isShow: false,
       rules: {
-        username: [{ required: true, message: "请输入角色名", trigger: "blur" }],
+        username: [
+          { required: true, message: "请输入角色名", trigger: "blur" }
+        ],
         email: [{ required: true, message: "请输入邮箱", trigger: "blur" }],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
         role_id: [{ required: true, message: "请选择角色", trigger: "blur" }]
       },
       roles: [],
-      page: 1,
       total: 0
     };
   },
@@ -101,9 +107,6 @@ export default {
     that.getList();
   },
   methods: {
-    onSubmit() {
-      console.log("submit!");
-    },
     search() {
       this.keywords.page = 1;
       this.getList();
@@ -135,7 +138,6 @@ export default {
                 this.$message.success("新增成功！");
               } else if (res.data.original && res.data.original.updated) {
                 that.isShow = false;
-                that.getList();
                 this.$message.success("修改成功！");
               } else if (res.data.original && res.data.original.find) {
                 this.$message.error(res.data.original.message);
@@ -152,8 +154,40 @@ export default {
       this.user = item ? item : {};
       this.isShow = true;
       http.getRolesAll().then(res => {
-        that.roles = res.data
+        that.roles = res.data;
       });
+    },
+    showDel(item) {
+      this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.deleteUser(item);
+        })
+        .catch(() => {
+          this.$message.info("已取消删除!");
+        });
+    },
+    deleteUser(item) {
+      const param = {
+        id: item.id,
+        orgcode: item.orgcode
+      }
+      http
+        .deleteUser(param)
+        .then(res => {
+          if (res.data.result) {
+            this.$message.success(res.data.message);
+            this.getList();
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+        .catch(res => {
+          this.$message.error("删除失败!");
+        });
     }
   }
 };
