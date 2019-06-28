@@ -52,7 +52,7 @@
     <el-dialog :title="user.id ? '修改' : '新增'" :visible.sync="isShow" width="500px">
       <el-form ref="formUser" :model="user" :rules="rules" label-width="120px">
         <el-form-item label="用户名" prop="username" style="width: 350px;">
-          <el-input v-model="user.username"></el-input>
+          <el-input v-model="user.username" :disabled="Boolean(user.id)"></el-input>
         </el-form-item>
         <el-form-item label="机构名" style="width: 350px;">
           <el-input v-model="user.orgname"></el-input>
@@ -92,7 +92,7 @@ export default {
       isShow: false,
       rules: {
         username: [
-          { required: true, message: "请输入角色名", trigger: "blur" }
+          { required: true, message: "请输入用户名", trigger: "blur" }
         ],
         email: [{ required: true, message: "请输入邮箱", trigger: "blur" }],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],

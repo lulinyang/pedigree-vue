@@ -1,27 +1,26 @@
 <template>
   <div class="login-wrap">
     <div class="ms-login">
-      <div class="ms-title">后台管理系统</div>
+      <div class="ms-title">族谱管理系统</div>
       <el-form :model="user" :rules="rules" ref="user" label-width="0px" class="ms-content">
         <el-form-item prop="username">
-          <el-input v-model="user.username" placeholder="username">
-            <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
+          <el-input v-model="user.username" placeholder="用户名">
+            <el-button slot="prepend" icon="el-icon-user-solid"></el-button>
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input
             type="password"
-            placeholder="password"
+            placeholder="密码"
             v-model="user.password"
             @keyup.enter.native="submitForm('user')"
           >
-            <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
+            <el-button slot="prepend" icon="el-icon-unlock"></el-button>
           </el-input>
         </el-form-item>
         <div class="login-btn">
           <el-button type="primary" @click="submitForm('user')">登录</el-button>
         </div>
-        <p class="login-tips">Tips : 用户名和密码随便填。</p>
       </el-form>
     </div>
   </div>
@@ -33,8 +32,8 @@ export default {
   data: function() {
     return {
       user: {
-        username: "admin",
-        password: "123456"
+        username: "",
+        password: ""
       },
       rules: {
         username: [
@@ -58,17 +57,15 @@ export default {
             this.getToken(this.user).then(res => {
               resolve(res);
             }).catch(err => {
+              this.$message.error("密码正确或用户不存在！");
               console.log('error', err);
             });
           }).then(res => {
             that.login({}).then(res => {
+              this.$message.success("登录成功！");
               this.$router.push('/');
-            });
+            })
           })
-          
-          //  console.log('formName', formName);
-          // localStorage.setItem('ms_username',this.ruleForm.username);
-          // this.$router.push('/');
         } else {
           console.log("error submit!!");
           return false;

@@ -2,11 +2,10 @@
 
 import axios from 'axios'
 import store from '@/store/index'
-// import config from './config'
-
+import config from '@/config/index'
 // 配置 axios，并生成实例
 const creatAxios = axios.create({
-  baseURL: 'http://api.com',
+  baseURL: config.baseUrl,
   withCredentials: true
 })
 

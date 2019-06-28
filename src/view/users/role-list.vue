@@ -160,6 +160,7 @@ export default {
       http
         .getNodesGetTree({})
         .then(res => {
+          console.log('res.data', res.data);
           that.nodeAll = res.data;
         })
         .catch(res => {});
@@ -175,9 +176,11 @@ export default {
     },
     getCheckedKeys() {
       const that = this;
-      var permission_id = this.$refs.tree.getCheckedKeys().toString();
+      var permission_id = this.$refs.tree.getCheckedKeys();
+      var half = this.$refs.tree.getHalfCheckedKeys();
+      var permIds = permission_id.concat(half).toString();
       const params = {
-        permission_id: permission_id,
+        permission_id: permIds,
         id: this.role.id
       };
       http

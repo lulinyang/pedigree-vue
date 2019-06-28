@@ -18,10 +18,10 @@
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         >
           <el-table-column prop="name" label="名称" width="180"></el-table-column>
-          <el-table-column prop="router" label="路由" width="180"></el-table-column>
-          <el-table-column prop="index" label="索引" width="180"></el-table-column>
+          <el-table-column prop="router" label="后端路由" width="180"></el-table-column>
+          <el-table-column prop="index" label="前端路由" width="180"></el-table-column>
           <el-table-column prop="icon" label="图标" width="180"></el-table-column>
-          <el-table-column prop="description" label="描述" width="180"></el-table-column>
+          <!-- <el-table-column prop="description" label="描述" width="180"></el-table-column> -->
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
           <el-table-column label="操作" width="180">
@@ -39,18 +39,18 @@
         <el-form-item label="节点名称" prop="name" style="width: 350px;">
           <el-input v-model="nodes.name"></el-input>
         </el-form-item>
-        <el-form-item label="路由" style="width: 350px;">
+        <el-form-item label="后端路由" style="width: 350px;">
           <el-input v-model="nodes.router"></el-input>
         </el-form-item>
-        <el-form-item label="索引" style="width: 350px;">
+        <el-form-item label="前端路由" style="width: 350px;">
           <el-input v-model="nodes.index"></el-input>
         </el-form-item>
         <el-form-item label="图标" style="width: 350px;">
           <el-input v-model="nodes.icon"></el-input>
         </el-form-item>
-        <el-form-item label="描述" style="width: 350px;">
+        <!-- <el-form-item label="描述" style="width: 350px;">
           <el-input v-model="nodes.description"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="父节点">
           <el-select v-model="nodes.pidLevel" filterable placeholder="请选择节点层级">
             <el-option label="顶级节点" value="0-0"></el-option>
