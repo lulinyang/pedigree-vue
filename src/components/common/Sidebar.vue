@@ -16,7 +16,8 @@
                                 </el-menu-item>
                             </el-submenu>
                             <el-menu-item v-else :index="subItem.index" :key="subItem.index">
-                                {{ subItem.title }}
+                                <!-- {{ subItem.title }} -->
+                                <i :class="subItem.icon"></i><span slot="title">{{ subItem.title }}</span>
                             </el-menu-item>
                         </template>
                     </el-submenu>
@@ -33,6 +34,7 @@
 
 <script>
     import bus from '../common/bus';
+    import http from "@/http/server/api";
     export default {
         data() {
             return {
@@ -49,6 +51,7 @@
                         title: '用户中心',
                         subs: [
                             {
+                                 icon: 'el-icon-lx-cascades',
                                 index: 'user-list',
                                 title: '用户管理'
                             },
@@ -146,10 +149,17 @@
         },
         computed:{
             onRoutes(){
+                // console.log('this.$store.state',this.$store.state);
                 return this.$route.path.replace('/','');
             }
         },
         created(){
+            http.getJurisdiction({}).then(res => {
+                console.log('res->', res);
+                this.items = res.data;
+            }).catch(res => {
+                console.log('error', res);
+            });
             // 通过 Event Bus 进行组件间通信，来折叠侧边栏
             bus.$on('collapse', msg => {
                 this.collapse = msg;

@@ -63,7 +63,6 @@ export default {
           }).then(res => {
             that.login({}).then(res => {
               this.$router.push('/');
-              console.log('userinfo', res);
             });
           })
           

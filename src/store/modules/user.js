@@ -3,15 +3,12 @@ import VueCookies from 'vue-cookies'
 const user = {
     state: {
         access_token: VueCookies.get('access_token'),
-        token_type: VueCookies.get('token_type'),
+        token_type: VueCookies.get('token_type')
     },
 
     mutations: {
         setAccessToken: (state, access_token) => {
             state.access_token = access_token
-        },
-        setExpiresIn: (state, expires_in) => {
-            state.expires_in = expires_in
         },
         setRefreshToken: (state, refresh_token) => {
             state.refresh_token = refresh_token
@@ -30,7 +27,7 @@ const user = {
         setLoginAt: (state, login_at) => {
             state.login_at = login_at;
             VueCookies.set('login_at', login_at);
-        },
+        }
     },
 
     actions: {
@@ -40,7 +37,6 @@ const user = {
                 http.getToken(param).then(response => {
                     const data = response.data;
                     commit('setAccessToken', data.access_token);
-                    commit('setExpiresIn', data.expires_in);
                     commit('setRefreshToken', data.access_token);
                     commit('setTokentype', data.token_type);
                     VueCookies.set('access_token', data.access_token, data.expires_in);
@@ -57,6 +53,7 @@ const user = {
             return new Promise((resolve, reject) => {
                 http.login(param).then(response => {
                     const data = response.data;
+                    commit('setUser', data);
                     commit('setName', data.username);
                     commit('setEmail', data.email);
                     commit('setLoginAt', data.login_at);

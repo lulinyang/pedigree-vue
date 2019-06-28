@@ -19,6 +19,8 @@
         >
           <el-table-column prop="name" label="名称" width="180"></el-table-column>
           <el-table-column prop="router" label="路由" width="180"></el-table-column>
+          <el-table-column prop="index" label="索引" width="180"></el-table-column>
+          <el-table-column prop="icon" label="图标" width="180"></el-table-column>
           <el-table-column prop="description" label="描述" width="180"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
@@ -39,6 +41,12 @@
         </el-form-item>
         <el-form-item label="路由" style="width: 350px;">
           <el-input v-model="nodes.router"></el-input>
+        </el-form-item>
+        <el-form-item label="索引" style="width: 350px;">
+          <el-input v-model="nodes.index"></el-input>
+        </el-form-item>
+        <el-form-item label="图标" style="width: 350px;">
+          <el-input v-model="nodes.icon"></el-input>
         </el-form-item>
         <el-form-item label="描述" style="width: 350px;">
           <el-input v-model="nodes.description"></el-input>
@@ -138,7 +146,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          if(item.children.length > 0) {
+          if (item.children.length > 0) {
             this.$message.warning("此节点还有子节点，不能删除!");
             return false;
           }
@@ -150,17 +158,20 @@ export default {
         });
     },
     deleteNode(item) {
-      http.deleteNode({id: item.id}).then(res => {
-        console.log('success', res);
-        if(res.data.result) {
-          this.$message.success(res.data.message);
-          this.getList();
-        }else {
-          this.$message.error(res.data.message);
-        }
-      }).catch(res => {
-        this.$message.error("删除失败!");
-      });
+      http
+        .deleteNode({ id: item.id })
+        .then(res => {
+          console.log("success", res);
+          if (res.data.result) {
+            this.$message.success(res.data.message);
+            this.getList();
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+        .catch(res => {
+          this.$message.error("删除失败!");
+        });
     }
   }
 };

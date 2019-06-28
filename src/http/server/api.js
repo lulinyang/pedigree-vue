@@ -76,6 +76,10 @@ class AllServiceApi extends extendsApi {
   deleteUser(params) {
     return this.sendPost('/api/deleteUser', params);
   }
+  //获取当前用户所有权限
+  getJurisdiction(params) {
+    return this.sendGet('/api/getJurisdiction', params);
+  }
 }
 
 export default new AllServiceApi()
