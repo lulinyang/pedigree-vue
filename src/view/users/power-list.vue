@@ -19,11 +19,21 @@
         >
           <el-table-column prop="name" label="名称" width="180"></el-table-column>
           <el-table-column prop="router" label="后端路由" width="180"></el-table-column>
-          <el-table-column prop="index" label="前端路由" width="180"></el-table-column>
-          <el-table-column prop="icon" label="图标" width="180"></el-table-column>
+          <el-table-column prop="index" label="前端路由"></el-table-column>
+          <el-table-column prop="icon" label="图标" width="50" align="center">
+            <template slot-scope="scope">
+              <i :class="scope.row.icon"></i>
+            </template>
+          </el-table-column>
+          <el-table-column prop="sort" label="排序" width="50" align="center"></el-table-column>
+          <el-table-column label="置顶" width="80">
+            <template slot-scope="scope">
+              <el-switch v-model="scope.row.top" @change="roofPlacement(scope.row)"></el-switch>
+            </template>
+          </el-table-column>
           <!-- <el-table-column prop="description" label="描述" width="180"></el-table-column> -->
-          <el-table-column prop="created_at" label="创建时间"></el-table-column>
-          <el-table-column prop="updated_at" label="更新时间"></el-table-column>
+          <el-table-column prop="created_at" label="创建时间" width="150"></el-table-column>
+          <el-table-column prop="updated_at" label="更新时间" width="150"></el-table-column>
           <el-table-column label="操作" width="180">
             <template slot-scope="scope">
               <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
@@ -48,9 +58,9 @@
         <el-form-item label="图标" style="width: 350px;">
           <el-input v-model="nodes.icon"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="描述" style="width: 350px;">
-          <el-input v-model="nodes.description"></el-input>
-        </el-form-item> -->
+        <el-form-item label="排序值" style="width: 350px;" :error="sortMessage">
+          <el-input v-model="nodes.sort"></el-input>
+        </el-form-item>
         <el-form-item label="父节点">
           <el-select v-model="nodes.pidLevel" filterable placeholder="请选择节点层级">
             <el-option label="顶级节点" value="0-0"></el-option>
@@ -84,13 +94,28 @@ export default {
         name: [{ required: true, message: "请输入节点名", trigger: "blur" }]
       },
       nodeAll: [],
-      total: 0
+      total: 0,
+      sortMessage: ''
     };
   },
   created() {
     this.getList();
   },
   methods: {
+    roofPlacement(item) {
+      item.isTop = true;
+      http
+        .addNode(item)
+        .then(res => {
+         if (res.data.original && res.data.original.updated) {
+            // that.isShow = false;
+            // this.$message.success("修改成功！");
+          } else {
+            this.$message.error("置顶失败！");
+          }
+        })
+        .catch(res => {});
+    },
     getList() {
       const that = this;
       http
@@ -104,6 +129,10 @@ export default {
       const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
+          if(isNaN(that.nodes.sort)) {
+            that.sortMessage = "排序值不是一个数值！";
+            return false;
+          }
           http
             .addNode(that.nodes)
             .then(res => {

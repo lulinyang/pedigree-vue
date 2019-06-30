@@ -10,9 +10,8 @@ import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import "babel-polyfill";
-
-
-
+// import VueUeditorWrap from 'vue-ueditor-wrap'
+// Vue.component('vue-ueditor-wrap', VueUeditorWrap)
 Vue.config.productionTip = false
 Vue.use(VueI18n);
 Vue.use(ElementUI, {

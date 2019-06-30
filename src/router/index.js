@@ -8,7 +8,7 @@ export default new Router({
     routes: [
         {
             path: '/',
-            redirect: '/dashboard'
+            redirect: '/home'
         },
         {
             path: '/',
@@ -16,7 +16,7 @@ export default new Router({
             meta: { title: '自述文件' },
             children:[
                 {
-                    path: '/dashboard',
+                    path: '/home',
                     component: resolve => require(['../components/page/Dashboard.vue'], resolve),
                     meta: { title: '系统首页' }
                 },
@@ -36,9 +36,9 @@ export default new Router({
                     meta: { title: '权限管理' }
                 },
                 {
-                    path: '/icon',
-                    component: resolve => require(['../components/page/Icon.vue'], resolve),
-                    meta: { title: '自定义图标' }
+                    path: '/articleManagement',
+                    component: resolve => require(['@/view/article/article-list.vue'], resolve),
+                    meta: { title: '文章管理' }
                 },
                 {
                     path: '/table',
