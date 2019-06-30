@@ -157,7 +157,7 @@ export default {
         item.pidLevel = item.pid + "-" + item.level;
         this.nodes = item;
       } else {
-        this.nodes = { pidLevel: "0-0" };
+        this.nodes = { pidLevel: "0-0", sort: 0 };
       }
       this.isShow = true;
       const that = this;

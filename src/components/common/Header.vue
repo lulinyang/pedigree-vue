@@ -24,7 +24,7 @@
         </div>-->
         <!-- 用户头像 -->
         <div class="user-avator">
-          <img :src="this.$store.state.user.headUrl" v-if="this.$store.state.user.headUrl">
+          <img :src="baseUrl + this.$store.state.user.headUrl" v-if="this.$store.state.user.headUrl">
 					<img v-else src="../../assets/img/img.jpg" alt="">
         </div>
         <!-- 用户名下拉菜单 -->
@@ -51,7 +51,7 @@
           name="img"
           :on-success="handleAvatarSuccess"
         >
-          <img v-if="info.headUrl" :src="info.headUrl" class="avatar">
+          <img v-if="info.headUrl" :src="baseUrl + info.headUrl" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
         <el-form-item label="用户名" prop="username">
@@ -107,6 +107,7 @@ export default {
       imageUrl: "",
       isPwd: false,
       pwd: {},
+      baseUrl: config.baseUrl,
 			upImgageUrl: config.baseUrl + "/api/upImage",
 			error: '',
       rules: {
@@ -171,7 +172,7 @@ export default {
     },
     handleAvatarSuccess(res, file) {
       if (res.res) {
-        this.info.headUrl = config.baseUrl + res.url;
+        this.info.headUrl =  res.url;
       } else {
         this.$message.error("上传失败！");
       }

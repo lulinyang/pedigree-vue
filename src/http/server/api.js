@@ -80,6 +80,38 @@ class AllServiceApi extends extendsApi {
   getJurisdiction(params) {
     return this.sendGet('/api/getJurisdiction', params);
   }
+  //新增族谱
+  addGenealogy(params) {
+    return this.sendPost('/api/addGenealogy', params);
+  }
+  //获取族谱列表
+  getGenealogyList(params) {
+    return this.sendGet('/api/getGenealogyList', params);
+  }
+  //根据id获取族谱
+  getGenealogy(params) {
+    return this.sendGet('/api/getGenealogy', params);
+  }
+  //删除族谱
+  deleteGenealogy(params) {
+    return this.sendPost('/api/deleteGenealogy', params);
+  }
+  //得到成员列表
+  getMemberList(params) {
+    return this.sendGet('/api/getMemberList', params);
+  }
+  //新增成员
+  addMember(params) {
+    return this.sendPost('/api/addMember', params);
+  }
+  //得到成员信息 
+  getMember(params) {
+    return this.sendGet('/api/getMember', params);
+  }
+  //删除族谱
+  deleteMember(params) {
+    return this.sendPost('/api/deleteMember', params);
+  }
 }
 
 export default new AllServiceApi()

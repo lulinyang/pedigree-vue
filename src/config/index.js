@@ -1,15 +1,110 @@
 const host = window.location.host;
 let ueBaseUrl = 'http://ueditor.up.com/';
 let baseUrl = '';
-if(/127.0.0.1/g.test(host) || /localhost/g.test(host) || /www.zupu.com/g.test(host)) {
+if (/127.0.0.1/g.test(host) || /localhost/g.test(host) || /www.zupu.com/g.test(host)) {
   baseUrl = 'http://api.com';
   ueBaseUrl = 'http://ueditor.up.com/';
-}else{
+} else {
   baseUrl = 'http://api.com';
   ueBaseUrl = 'http://ueditor.up.com/';
 }
 
+const toolbars = [
+  [
+    "fullscreen",
+    "source",
+    "|",
+    "undo",
+    "redo",
+    "|",
+    "bold",
+    "italic",
+    "underline",
+    "fontborder",
+    "strikethrough",
+    "superscript",
+    "subscript",
+    "removeformat",
+    "formatmatch",
+    "autotypeset",
+    "blockquote",
+    "pasteplain",
+    "|",
+    "forecolor",
+    "backcolor",
+    "insertorderedlist",
+    "insertunorderedlist",
+    "selectall",
+    "cleardoc",
+    "|",
+    "rowspacingtop",
+    "rowspacingbottom",
+    "lineheight",
+    "|",
+    "customstyle",
+    "paragraph",
+    "fontfamily",
+    "fontsize",
+    "|",
+    "directionalityltr",
+    "directionalityrtl",
+    "indent",
+    "|",
+    "justifyleft",
+    "justifycenter",
+    "justifyright",
+    "justifyjustify",
+    "|",
+    "touppercase",
+    "tolowercase",
+    "|",
+    "link",
+    "unlink",
+    "anchor",
+    "|",
+    "imagenone",
+    "imageleft",
+    "imageright",
+    "imagecenter",
+    "|",
+    "insertimage",
+    "emotion",
+    "scrawl",
+    "insertvideo",
+    "music",
+    "attachment",
+    "insertframe",
+    "pagebreak",
+    "template",
+    "background",
+    "|",
+    "horizontal",
+    "date",
+    "time",
+    "spechars",
+    "wordimage",
+    "|",
+    "inserttable",
+    "deletetable",
+    "insertparagraphbeforetable",
+    "insertrow",
+    "deleterow",
+    "insertcol",
+    "deletecol",
+    "mergecells",
+    "mergeright",
+    "mergedown",
+    "splittocells",
+    "splittorows",
+    "splittocols",
+    "charts",
+    "|",
+    ,
+    "preview"
+  ]
+];
 export default {
   baseUrl,
-  ueBaseUrl
+  ueBaseUrl,
+  toolbars
 }
