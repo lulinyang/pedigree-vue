@@ -3,6 +3,7 @@ node_modules
 /dist
 example.html
 favicon.ico
+/public/ueditor
 # local env files
 .env.local
 .env.*.local
