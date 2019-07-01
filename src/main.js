@@ -31,6 +31,7 @@ const i18n = new VueI18n({
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
+    // console.log(to, from, next);
     if ((!VueCookies.isKey('access_token') || !VueCookies.isKey('username')) && to.path !== '/login') {
         next('/login');
     } else if (to.meta.permission) {

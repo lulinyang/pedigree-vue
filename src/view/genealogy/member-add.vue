@@ -68,7 +68,7 @@ export default {
   data() {
     return {
       id: "",
-      member: {},
+      member: {sex: 1, isdead: 0},
       isShowImg: true,
       options: area,
       baseUrl: config.baseUrl,
@@ -89,7 +89,7 @@ export default {
     created() {
       let id = this.$cookies.get("memberId");
       this.id = id;
-      if (id != "") {
+      if (id && id != "") {
         const that = this;
         http
           .getMember({ id, id })

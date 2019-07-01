@@ -112,6 +112,26 @@ class AllServiceApi extends extendsApi {
   deleteMember(params) {
     return this.sendPost('/api/deleteMember', params);
   }
+  //得到族谱详情成员(树形)，
+  getPedigreeTree(params) {
+    return this.sendGet('/api/getPedigreeTree', params);
+  }
+  //获取全部成员
+  getMemberAll(params) {
+    return this.sendGet('/api/getMemberAll', params);
+  }
+  //添加族谱详情列表
+  addPedigree(params) {
+    return this.sendPost('/api/addPedigree', params);
+  }
+  //得到族谱详情成员(分类)
+  getPedigreeAll(params) {
+    return this.sendGet('/api/getPedigreeAll', params);
+  }
+  //删除族谱详情成员
+  deletePedigree(params) {
+    return this.sendPost('/api/deletePedigree', params);
+  }
 }
 
 export default new AllServiceApi()

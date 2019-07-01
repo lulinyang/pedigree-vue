@@ -51,6 +51,16 @@ export default new Router({
                     meta: { title: '编辑族谱' }
                 },
                 {
+                    path: '/pedigree-list',
+                    component: resolve => require(['@/view/genealogy/pedigree-list.vue'], resolve),
+                    meta: { title: '族谱详情' }
+                },
+                {
+                    path: '/pedigree-topology',
+                    component: resolve => require(['@/view/genealogy/pedigree-topology.vue'], resolve),
+                    meta: { title: '族谱拓扑图' }
+                },
+                {
                     path: '/member-list',
                     component: resolve => require(['@/view/genealogy/member-list.vue'], resolve),
                     meta: { title: '成员管理' }

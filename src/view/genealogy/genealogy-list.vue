@@ -21,7 +21,7 @@
       <div>
         <el-table :data="surnamList" border style="width: 100%">
           <el-table-column prop="area_surname" label="区域姓氏" width="150"></el-table-column>
-          <el-table-column label="缩略图" width="180">
+          <el-table-column label="缩略图" width="90">
             <template slot-scope="scope">
               <el-image :src="baseUrl + scope.row.thumbnail"></el-image>
             </template>
@@ -30,9 +30,10 @@
           <el-table-column prop="username" label="创建人"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-          <el-table-column label="操作" width="180">
+          <el-table-column label="操作" width="270">
             <template slot-scope="scope">
               <el-button type="primary" icon="el-icon-edit" @click="editGenealogy(scope.row.id)">编辑</el-button>
+              <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
               <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
             </template>
           </el-table-column>
@@ -54,6 +55,7 @@
 <script>
 import http from "@/http/server/api";
 import config from "@/config/index";
+// import memberListVue from './member-list.vue';
 export default {
   data() {
     return {
@@ -67,10 +69,19 @@ export default {
     };
   },
   created() {
+    console.log('--');
     const that = this;
     that.getList();
   },
   methods: {
+    seePedigree(id) {
+      this.$router.push({
+        path: "pedigree-list",
+        query: {
+          id: id
+        }
+      });
+    },
     search() {},
     getList() {
       const that = this;
@@ -88,7 +99,7 @@ export default {
     },
     editGenealogy(id) {
       this.$cookies.set("genealogyId", id);
-      this.$router.push("/genealogy-edit");
+      this.$router.push("/genealogy-edit/");
     },
     showDel(id) {
 			const that = this;
