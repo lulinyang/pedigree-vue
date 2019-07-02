@@ -18,7 +18,7 @@
           default-expand-all
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         >
-				<el-table-column prop="title" label="标题"  align="center"></el-table-column>
+				<el-table-column prop="title" label="标题"  align="left"></el-table-column>
           <el-table-column prop="sort" label="排序"  align="center"></el-table-column>
           <!-- <el-table-column label="置顶">
             <template slot-scope="scope">

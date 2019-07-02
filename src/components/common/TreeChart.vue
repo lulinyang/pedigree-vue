@@ -5,15 +5,21 @@
           <div :class="{node: true, hasMate: treeData.mate}">
             <div class="person" @click="$emit('click-node', treeData)">
               <div class="avat">
-                <img :src="treeData.image_url" />
+                <img :src="baseUrl + treeData.image_url" />
               </div>
-              <div class="name">{{treeData.name}}</div>
+              <div class="name">
+                {{treeData.name}}
+                <i :class="{'el-icon-male primary': treeData.sex == 1, 'el-icon-female danger': treeData.sex == 0}"></i>
+              </div>
             </div>
             <div class="person" v-if="treeData.mate" @click="$emit('click-node', treeData.mate)">
               <div class="avat">
-                <img :src="treeData.mate.image_url" />
+                <img :src="baseUrl + treeData.mate.image_url" />
               </div>
-              <div class="name">{{treeData.mate.name}}</div>
+              <div class="name">
+                {{treeData.mate.name}}
+                <i :class="{'el-icon-male primary': treeData.mate.sex == 1, 'el-icon-female danger': treeData.mate.sex == 0}"></i>
+              </div>
             </div>
           </div>
           <div class="extend_handle" v-if="treeData.children" @click="toggleExtend(treeData)"></div>
@@ -28,12 +34,14 @@
 </template>
 
 <script>
+import config from "@/config/index";
 export default {
   name: "TreeChart",
   props: ["json"],
   data() {
     return {
-      treeData: {}
+      treeData: {},
+      baseUrl: config.baseUrl,
     }
   },
   watch: {
@@ -65,6 +73,12 @@ export default {
 </script>
 
 <style scoped>
+.primary {
+  color: #409eff;
+}
+.danger {
+  color: #f56c6c;
+}
 table{border-collapse: separate!important;border-spacing: 0!important;}
 td{position: relative; vertical-align: top;padding:0 0 50px 0;text-align: center; }
 

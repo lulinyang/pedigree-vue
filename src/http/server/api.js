@@ -132,6 +132,10 @@ class AllServiceApi extends extendsApi {
   deletePedigree(params) {
     return this.sendPost('/api/deletePedigree', params);
   }
+  //得到族谱详情成员(拓扑图)
+  getTreeChart(params) {
+    return this.sendGet('/api/getTreeChart', params);
+  }
 }
 
 export default new AllServiceApi()

@@ -44,6 +44,7 @@
       </div>
     </el-card>
 
+
     <el-dialog :title="nodes.id ? '修改' : '新增'" :visible.sync="isShow" width="500px">
       <el-form ref="formNode" :model="nodes" :rules="rules" label-width="120px">
         <el-form-item label="节点名称" prop="name" style="width: 350px;">
@@ -62,7 +63,7 @@
           <el-input v-model="nodes.sort"></el-input>
         </el-form-item>
         <el-form-item label="父节点">
-          <el-select v-model="nodes.pidLevel" filterable placeholder="请选择节点层级">
+          <el-select v-model="nodes.pidLevel" filterable placeholder="请选择节点层级" :disabled="nodes.id ? true : false">
             <el-option label="顶级节点" value="0-0"></el-option>
             <el-option
               v-for="item in nodeAll"
