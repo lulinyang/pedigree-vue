@@ -11,13 +11,6 @@
           </el-form-item>
         </el-form>
       </div>
-      <!-- <el-row>
-        <el-col :span="24">
-          <div class="grid-content bg-purple-dark">
-            <el-button type="primary" icon="el-icon-plus" @click="showModal(false)">新增用户</el-button>
-          </div>
-        </el-col>
-      </el-row>-->
       <div>
         <el-table :data="surnamList" border style="width: 100%">
           <el-table-column prop="area_surname" label="区域姓氏" width="150"></el-table-column>
@@ -30,11 +23,20 @@
           <el-table-column prop="username" label="创建人"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-          <el-table-column label="操作" width="270">
+          <el-table-column label="操作" width="200">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="editGenealogy(scope.row.id)">编辑</el-button>
-              <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
-              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
+              <el-row>
+                <el-button
+                  type="primary"
+                  icon="el-icon-edit"
+                  @click="editGenealogy(scope.row.id)"
+                >编辑</el-button>
+                <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
+              </el-row>
+              <el-row style="margin-top: 8px">
+                <el-button type="info" @click="seePedigree(scope.row.id)">简介</el-button>
+                <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
+              </el-row>
             </template>
           </el-table-column>
         </el-table>
@@ -69,7 +71,6 @@ export default {
     };
   },
   created() {
-    console.log('--');
     const that = this;
     that.getList();
   },
@@ -98,21 +99,26 @@ export default {
       this.getList();
     },
     editGenealogy(id) {
-      this.$cookies.set("genealogyId", id);
-      this.$router.push("/genealogy-edit/");
+      this.$router.push({
+        path: "/genealogy-edit",
+        query: {
+          id: id
+        }
+      });
     },
     showDel(id) {
-			const that = this;
+      const that = this;
       this.$confirm("确认此数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-          http.deleteGenealogy({id: id})
+          http
+            .deleteGenealogy({ id: id })
             .then(res => {
               if (res.data.code == 200) {
-								this.$message.success("删除成功！");
+                this.$message.success("删除成功！");
                 that.getList();
               }
             })

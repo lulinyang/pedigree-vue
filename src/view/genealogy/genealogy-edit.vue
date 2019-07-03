@@ -7,7 +7,7 @@
       <el-form-item label="缩略图">
         <el-upload
           class="avatar-uploader"
-					name="img"
+          name="img"
           :action="upImgageUrl"
           :show-file-list="false"
           :on-success="handleThumbnailSuccess"
@@ -31,11 +31,11 @@
           :destroy="destroy"
           :config="config"
           @ready="ready"
-					style="width: 800px"
+          style="width: 800px"
         ></vue-ueditor-wrap>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('genealogyForm')">立即创建</el-button>
+        <el-button type="primary" @click="onSubmit('genealogyForm')">{{ id == '' ? '立即创建' : '保存'}}</el-button>
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
@@ -45,19 +45,20 @@
 import VueUeditorWrap from "vue-ueditor-wrap";
 import config from "@/config/index";
 import http from "@/http/server/api";
-import { setTimeout } from 'timers';
+import { setTimeout } from "timers";
 export default {
   components: {
     VueUeditorWrap
-	},
-	
+  },
+
   data() {
     return {
-			genealogy: {},
-			isShowImg: true,
-			baseUrl: config.baseUrl,
-			upImgageUrl: config.baseUrl + "/api/upImage",
-			destroy: false,
+      id: "",
+      genealogy: {},
+      isShowImg: true,
+      baseUrl: config.baseUrl,
+      upImgageUrl: config.baseUrl + "/api/upImage",
+      destroy: false,
       config: {
         autoHeightEnabled: false,
         initialFrameHeight: 500,
@@ -69,9 +70,28 @@ export default {
         area_surname: [{ required: true, message: "区域姓氏", trigger: "blur" }]
       }
     };
-	},
-	created() {
-	},
+  },
+  created() {
+    this.id = this.$route.query.id;
+    if (this.id != "") {
+      const that = this;
+      http
+        .getGenealogy({ id: this.id })
+        .then(res => {
+          if (res.data.code == "200") {
+            if (res.data.result.thumbnail) {
+              this.isShowImg = false;
+            }
+            res.data.result.brief_introduction =
+              res.data.result.brief_introduction == null
+                ? " "
+                : res.data.result.brief_introduction;
+            that.genealogy = res.data.result;
+          }
+        })
+        .catch(res => {});
+    }
+  },
   methods: {
     ready(editorInstance) {
       console.log(`实例${editorInstance.key}已经初始化:`, editorInstance);
@@ -86,27 +106,30 @@ export default {
       const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
-					http.addGenealogy(that.genealogy).then(res => {
-						if (res.data.original && res.data.original.created) {
-								this.$message.success("新增成功！");
-								this.$router.push('/genealogy-list');
+          http
+            .addGenealogy(that.genealogy)
+            .then(res => {
+              if (res.data.original && res.data.original.created) {
+                this.$message.success("新增成功！");
+                this.$router.push("/genealogy-list");
               } else if (res.data.original && res.data.original.updated) {
-								this.$message.success("修改成功！");
-								this.$router.push('/genealogy-list');
+                this.$message.success("修改成功！");
+                this.$router.push("/genealogy-list");
               } else {
                 this.$message.error("添加失败！");
               }
-					}).catch(res => {});
-        }else{
-					this.$message.error('区域姓氏必填！');
-				}
+            })
+            .catch(res => {});
+        } else {
+          this.$message.error("区域姓氏必填！");
+        }
       });
     },
     handleThumbnailSuccess(res, file) {
       if (res.res) {
-				this.genealogy.thumbnail =  res.url;
-				this.isShowImg = false;
-				// console.log(URL.createObjectURL(file.raw));
+        this.genealogy.thumbnail = res.url;
+        this.isShowImg = false;
+        // console.log(URL.createObjectURL(file.raw));
       } else {
         this.$message.error("上传失败！");
       }
@@ -114,7 +137,7 @@ export default {
   },
   destroyed() {
     console.log("将editor进行销毁");
-		this.destroy = true;
+    this.destroy = true;
   }
 };
 </script>

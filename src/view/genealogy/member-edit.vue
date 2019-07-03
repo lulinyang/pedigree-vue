@@ -48,7 +48,7 @@
         ></vue-ueditor-wrap>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('memberForm')">保存</el-button>
+        <el-button type="primary" @click="onSubmit('memberForm')">{{ id == '' ? '立即创建' : '保存'}}</el-button>
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
@@ -68,7 +68,7 @@ export default {
   data() {
     return {
       id: "",
-      member: { sex: 1, isdead: 0, brief_introduction: '' },
+      member: {},
       isShowImg: true,
       options: area,
       baseUrl: config.baseUrl,
@@ -87,32 +87,36 @@ export default {
     };
   },
   created() {
-    // this.id = this.$route.query.id;
-    // if (this.id && this.id != "") {
-    //   const that = this;
-    //   http
-    //     .getMember({ id: this.id })
-    //     .then(res => {
-    //       if (res.data.code == "200") {
-    //         if (res.data.result.thumbnail) {
-    //           this.isShowImg = false;
-    //         }
-    //         that.member = res.data.result;
-    //       }
-    //     })
-    //     .catch(res => {});
-    // }
+    this.id = this.$route.query.id;
+    if (this.id && this.id != "") {
+      const that = this;
+      http
+        .getMember({ id: this.id })
+        .then(res => {
+          if (res.data.code == "200") {
+            if (res.data.result.thumbnail) {
+              that.isShowImg = false;
+            }
+            res.data.result.brief_introduction =
+              res.data.result.brief_introduction == null
+                ? " "
+                : res.data.result.brief_introduction;
+            that.member = res.data.result;
+          }
+        })
+        .catch(res => {});
+    }
   },
   methods: {
     ready(editorInstance) {
       console.log(`实例${editorInstance.key}已经初始化:`, editorInstance);
     },
-    // addCustomUI(editorId, editorConfig) {
-    //   console.log(
-    //     editorId + "的配置参数是:",
-    //     JSON.stringify(editorConfig, null, 2)
-    //   );
-    // },
+    addCustomUI(editorId, editorConfig) {
+      console.log(
+        editorId + "的配置参数是:",
+        JSON.stringify(editorConfig, null, 2)
+      );
+    },
     onSubmit(formName) {
       const that = this;
       this.$refs[formName].validate(valid => {

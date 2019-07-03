@@ -136,6 +136,34 @@ class AllServiceApi extends extendsApi {
   getTreeChart(params) {
     return this.sendGet('/api/getTreeChart', params);
   }
+  //得到分类列表
+  getColumnList(params) {
+    return this.sendGet('/api/getColumnList', params);
+  }
+  //新增栏目
+  addColumn(params) {
+    return this.sendPost('/api/addColumn', params);
+  }
+  //删除栏目
+  delColumn(params) {
+    return this.sendPost('/api/delColumn', params);
+  }
+  //新增文章
+  addarticle(params) {
+    return this.sendPost('/api/addarticle', params);
+  }
+  //获取文章列表
+  getArcticlList(params) {
+    return this.sendGet('/api/getArcticlList', params);
+  }
+  //根据id得到一篇文章
+  getArticle(params) {
+    return this.sendGet('/api/getArticle', params);
+  }
+  //删除文章
+  deleteArcticle(params) {
+    return this.sendPost('/api/deleteArcticle', params);
+  }
 }
 
 export default new AllServiceApi()

@@ -8,6 +8,7 @@
       text-color="#bfcbd9"
       active-text-color="#20a0ff"
       unique-opened
+      @open="openIndex"
       router
     >
       <template v-for="item in items">
@@ -73,6 +74,11 @@ export default {
     bus.$on("collapse", msg => {
       this.collapse = msg;
     });
+  },
+  methods: {
+    openIndex(e) {
+      console.log('index', e);
+    }
   }
 };
 </script>

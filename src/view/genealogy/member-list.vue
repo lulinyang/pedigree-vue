@@ -122,7 +122,7 @@ export default {
         });
     },
     deletemember(id) {
-			const that =  this;
+      const that = this;
       http
         .deleteMember({ id: id })
         .then(res => {
@@ -141,8 +141,12 @@ export default {
     },
     showModal(id) {
       if (id) {
-        this.$cookies.set("memberId", id);
-        this.$router.push("/member-edit");
+        this.$router.push({
+          path: "/member-edit",
+          query: {
+            id: id
+          }
+        });
       } else {
         this.$router.push("/member-add");
       }

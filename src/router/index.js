@@ -47,7 +47,7 @@ export default new Router({
                 },
                 {
                     path: '/genealogy-edit',
-                    component: resolve => require(['@/view/genealogy/genealogy-add.vue'], resolve),
+                    component: resolve => require(['@/view/genealogy/genealogy-edit.vue'], resolve),
                     meta: { title: '编辑族谱' }
                 },
                 {
@@ -72,15 +72,34 @@ export default new Router({
                 },
                 {
                     path: '/member-edit',
-                    component: resolve => require(['@/view/genealogy/member-add.vue'], resolve),
+                    component: resolve => require(['@/view/genealogy/member-edit.vue'], resolve),
                     meta: { title: '编辑成员' }
                 },
                 {
-                    path: '/articleManagement',
-                    component: resolve => require(['@/view/article/article-list.vue'], resolve),
-                    meta: { title: '文章管理' }
+                    path: '/column-list',
+                    component: resolve => require(['@/view/article/column-list.vue'], resolve),
+                    meta: { title: '栏目管理' }
                 },
-              
+                {
+                    path: '/article-list',
+                    component: resolve => require(['@/view/article/article-list.vue'], resolve),
+                    meta: { title: '文章列表' }
+                },
+                {
+                    path: '/article-add',
+                    component: resolve => require(['@/view/article/article-add.vue'], resolve),
+                    meta: { title: '新增文章' }
+                },
+                {
+                    path: '/article-edit',
+                    component: resolve => require(['@/view/article/article-edit.vue'], resolve),
+                    meta: { title: '编辑文章' }
+                },
+                {
+                    path: '/article-detail',
+                    component: resolve => require(['@/view/article/article-detail.vue'], resolve),
+                    meta: { title: '文章详情' }
+                },
                 {
                     // markdown组件
                     path: '/markdown',
