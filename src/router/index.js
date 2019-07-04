@@ -51,6 +51,11 @@ export default new Router({
                     meta: { title: '编辑族谱' }
                 },
                 {
+                    path: '/genealogy-detail',
+                    component: resolve => require(['@/view/genealogy/genealogy-detail.vue'], resolve),
+                    meta: { title: '家族简介' }
+                },
+                {
                     path: '/pedigree-list',
                     component: resolve => require(['@/view/genealogy/pedigree-list.vue'], resolve),
                     meta: { title: '族谱详情' }
@@ -74,6 +79,11 @@ export default new Router({
                     path: '/member-edit',
                     component: resolve => require(['@/view/genealogy/member-edit.vue'], resolve),
                     meta: { title: '编辑成员' }
+                },
+                {
+                    path: '/member-detail',
+                    component: resolve => require(['@/view/genealogy/member-detail.vue'], resolve),
+                    meta: { title: '成员简介' }
                 },
                 {
                     path: '/column-list',

@@ -34,12 +34,21 @@
         </el-table>
       </div>
       <div style="text-align: center;padding-top: 20px">
-        <el-pagination 
+        <!-- <el-pagination 
           background 
           layout="prev, pager, next" 
           :total="total" 
           :page-size="8"
-          @current-change="changeCurrent"></el-pagination>
+        @current-change="changeCurrent"></el-pagination>-->
+        <el-pagination
+          background
+          @current-change="changeCurrent"
+          @size-change="handleSizeChange"
+          :page-sizes="[8, 15, 50, 100, 200]"
+          :page-size="keywords.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+        ></el-pagination>
       </div>
     </el-card>
 
@@ -86,7 +95,8 @@ export default {
       rolelist: [],
       keywords: {
         name: "",
-        page: 1
+        page: 1,
+        pageSize: 8
       },
       role: {
         pid: 0
@@ -111,8 +121,12 @@ export default {
     search() {
       this.getList();
     },
-     changeCurrent(page) {
+    changeCurrent(page) {
       this.keywords.page = page;
+      this.getList();
+    },
+    handleSizeChange(pageSize) {
+      this.keywords.pageSize = pageSize;
       this.getList();
     },
     getList() {
@@ -160,7 +174,7 @@ export default {
       http
         .getNodesGetTree({})
         .then(res => {
-          console.log('res.data', res.data);
+          console.log("res.data", res.data);
           that.nodeAll = res.data;
         })
         .catch(res => {});
@@ -168,7 +182,7 @@ export default {
       setTimeout(() => {
         var permission_ids = item.permission_id;
         var arr = [];
-        if(permission_ids != null) {
+        if (permission_ids != null) {
           arr = permission_ids.split(",");
         }
         this.$refs.tree.setCheckedKeys(arr);
@@ -195,7 +209,7 @@ export default {
         })
         .catch(res => {});
     },
-     showDel(item) {
+    showDel(item) {
       this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -209,16 +223,19 @@ export default {
         });
     },
     deleteRole(item) {
-      http.deleteRole({id: item.id}).then(res => {
-        if(res.data.result) {
-          this.$message.success(res.data.message);
-          this.getList();
-        }else {
-          this.$message.error(res.data.message);
-        }
-      }).catch(res => {
-        this.$message.error("删除失败!");
-      });
+      http
+        .deleteRole({ id: item.id })
+        .then(res => {
+          if (res.data.result) {
+            this.$message.success(res.data.message);
+            this.getList();
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+        .catch(res => {
+          this.$message.error("删除失败!");
+        });
     }
   }
 };

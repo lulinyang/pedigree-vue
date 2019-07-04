@@ -3,8 +3,14 @@
     <el-card class="box-card" style="width: 100%;">
       <div slot="header" class="clearfix">
         <el-form :inline="true" :model="keywords" class="demo-form-inline">
-          <el-form-item label="用户名">
-            <el-input v-model="keywords.username" placeholder="区域姓氏"></el-input>
+          <el-form-item label="区域姓氏">
+            <el-input v-model="keywords.area_surname" placeholder="区域姓氏"></el-input>
+          </el-form-item>
+           <el-form-item label="描述">
+            <el-input v-model="keywords.describe" placeholder="请输入描述"></el-input>
+          </el-form-item>
+          <el-form-item label="创建人">
+            <el-input v-model="keywords.username" placeholder="请输入描述"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="search">查询</el-button>
@@ -34,7 +40,7 @@
                 <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
               </el-row>
               <el-row style="margin-top: 8px">
-                <el-button type="info" @click="seePedigree(scope.row.id)">简介</el-button>
+                <el-button type="info" @click="seeDetail(scope.row.id)">简介</el-button>
                 <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
               </el-row>
             </template>
@@ -44,10 +50,12 @@
       <div style="text-align: center;padding-top: 20px">
         <el-pagination
           background
-          layout="prev, pager, next"
-          :total="total"
-          :page-size="8"
           @current-change="changeCurrent"
+          @size-change="handleSizeChange"
+          :page-sizes="[8, 15, 50, 100, 200]"
+          :page-size="keywords.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
         ></el-pagination>
       </div>
     </el-card>
@@ -63,7 +71,8 @@ export default {
     return {
       keywords: {
         area_surname: "",
-        page: 1
+        page: 1,
+        pageSize: 8
       },
       surnamList: [],
       total: 0,
@@ -71,8 +80,7 @@ export default {
     };
   },
   created() {
-    const that = this;
-    that.getList();
+    this.getList();
   },
   methods: {
     seePedigree(id) {
@@ -83,7 +91,9 @@ export default {
         }
       });
     },
-    search() {},
+    search() {
+      this.getList();
+    },
     getList() {
       const that = this;
       http
@@ -98,9 +108,21 @@ export default {
       this.keywords.page = page;
       this.getList();
     },
+     handleSizeChange(pageSize) {
+      this.keywords.pageSize = pageSize;
+      this.getList();
+    },
     editGenealogy(id) {
       this.$router.push({
         path: "/genealogy-edit",
+        query: {
+          id: id
+        }
+      });
+    },
+    seeDetail(id) {
+      this.$router.push({
+        path: "/genealogy-detail",
         query: {
           id: id
         }

@@ -18,14 +18,14 @@
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         >
           <el-table-column prop="name" label="名称" width="180"></el-table-column>
-          <el-table-column prop="router" label="后端路由" width="180"></el-table-column>
+          <!-- <el-table-column prop="router" label="后端路由" width="180"></el-table-column> -->
           <el-table-column prop="index" label="前端路由"></el-table-column>
-          <el-table-column prop="icon" label="图标" width="50" align="center">
+          <el-table-column prop="icon" label="图标" width="80" align="center">
             <template slot-scope="scope">
               <i :class="scope.row.icon"></i>
             </template>
           </el-table-column>
-          <el-table-column prop="sort" label="排序" width="50" align="center"></el-table-column>
+          <el-table-column prop="sort" label="排序" width="80" align="center"></el-table-column>
           <el-table-column label="置顶" width="80">
             <template slot-scope="scope">
               <el-switch v-model="scope.row.top" @change="roofPlacement(scope.row)"></el-switch>
@@ -50,9 +50,9 @@
         <el-form-item label="节点名称" prop="name" style="width: 350px;">
           <el-input v-model="nodes.name"></el-input>
         </el-form-item>
-        <el-form-item label="后端路由" style="width: 350px;">
+        <!-- <el-form-item label="后端路由" style="width: 350px;">
           <el-input v-model="nodes.router"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="前端路由" style="width: 350px;">
           <el-input v-model="nodes.index"></el-input>
         </el-form-item>

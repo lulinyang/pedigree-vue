@@ -4,7 +4,25 @@
       <div slot="header" class="clearfix">
         <el-form :inline="true" :model="keywords" class="demo-form-inline">
           <el-form-item label="标题">
-            <el-input v-model="keywords.username" placeholder="强输入标题"></el-input>
+            <el-input v-model="keywords.title" placeholder="请输入标题"></el-input>
+          </el-form-item>
+
+          <el-form-item label="栏目">
+            <el-select v-model="keywords.type" filterable placeholder="请选择栏目">
+              <el-option :value="''" :label="'全部'"></el-option>
+              <el-option
+                v-for="item in columnlist"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input v-model="keywords.describe" placeholder="请输入描述"></el-input>
+          </el-form-item>
+          <el-form-item label="创建人">
+            <el-input v-model="keywords.create_user" placeholder="请输入创建人"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="search">查询</el-button>
@@ -14,7 +32,8 @@
       <div>
         <el-table :data="arcticleList" border style="width: 100%">
           <el-table-column prop="title" label="标题" width="200"></el-table-column>
-          <el-table-column label="缩略图" width="90">
+          <el-table-column prop="typename" label="所属栏目"></el-table-column>
+          <el-table-column label="缩略图" width="120">
             <template slot-scope="scope">
               <el-image :src="baseUrl + scope.row.thumbnail"></el-image>
             </template>
@@ -36,10 +55,12 @@
       <div style="text-align: center;padding-top: 20px">
         <el-pagination
           background
-          layout="prev, pager, next"
-          :total="total"
-          :page-size="8"
           @current-change="changeCurrent"
+          @size-change="handleSizeChange"
+          :page-sizes="[8, 15, 50, 100, 200]"
+          :page-size="keywords.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
         ></el-pagination>
       </div>
     </el-card>
@@ -54,20 +75,31 @@ export default {
   data() {
     return {
       keywords: {
-        area_surname: "",
-        page: 1
+        title: "",
+        page: 1,
+        pageSize: 8,
+        type: ''
       },
       arcticleList: [],
       total: 0,
-      baseUrl: config.baseUrl
+      baseUrl: config.baseUrl,
+      columnlist: []
     };
   },
   created() {
-    const that = this;
-    that.getList();
+    http
+      .getColumnList({})
+      .then(res => {
+        this.columnlist = res.data.data;
+        console.log("this.columnlist", this.columnlist);
+      })
+      .catch(res => {});
+    this.getList();
   },
   methods: {
-    search() {},
+    search() {
+      this.getList();
+    },
     getList() {
       const that = this;
       http
@@ -82,26 +114,31 @@ export default {
       this.keywords.page = page;
       this.getList();
     },
+    handleSizeChange(pageSize) {
+      this.keywords.pageSize = pageSize;
+      this.getList();
+    },
     editArcticl(id) {
       this.$router.push({
-        path: '/article-edit',
+        path: "/article-edit",
         query: {
           id: id
-				}
+        }
       });
     },
     showDel(id) {
-			const that = this;
+      const that = this;
       this.$confirm("确认此数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-          http.deleteArcticle({id: id})
+          http
+            .deleteArcticle({ id: id })
             .then(res => {
               if (res.data.code == 200) {
-								this.$message.success("删除成功！");
+                this.$message.success("删除成功！");
                 that.getList();
               }
             })
@@ -113,10 +150,10 @@ export default {
     },
     showDetail(id) {
       this.$router.push({
-        path: '/article-detail',
+        path: "/article-detail",
         query: {
           id: id
-				}
+        }
       });
     }
   }

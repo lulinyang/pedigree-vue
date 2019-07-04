@@ -39,12 +39,21 @@
         </el-table>
       </div>
       <div style="text-align: center;padding-top: 20px">
-        <el-pagination
+        <!-- <el-pagination
           background
           layout="prev, pager, next"
           :total="total"
           :page-size="8"
           @current-change="changeCurrent"
+        ></el-pagination> -->
+        <el-pagination
+          background
+          @current-change="changeCurrent"
+          @size-change="handleSizeChange"
+          :page-sizes="[8, 15, 50, 100, 200]"
+          :page-size="keywords.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
         ></el-pagination>
       </div>
     </el-card>
@@ -86,7 +95,8 @@ export default {
       keywords: {
         username: "",
         email: "",
-        page: 1
+        page: 1,
+        pageSize: 8
       },
       user: {},
       isShow: false,
@@ -123,6 +133,10 @@ export default {
     },
     changeCurrent(page) {
       this.keywords.page = page;
+      this.getList();
+    },
+    handleSizeChange(pageSize) {
+      this.keywords.pageSize = pageSize;
       this.getList();
     },
     addUser(formName) {
