@@ -99,7 +99,7 @@ export default {
   width: 350px;
   margin: -190px 0 0 -175px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.4);
   overflow: hidden;
 }
 .ms-content {
