@@ -62,7 +62,7 @@ export default {
         autoHeightEnabled: false,
         initialFrameHeight: 500,
         initialFrameWidth: "100%",
-        serverUrl: config.ueBaseUrl + "/static/UE/php/controller.php",
+        serverUrl: config.ueBaseUrl + "/static/UEditor/php/controller.php",
         toolbars: config.toolbars
       },
       rules: {
