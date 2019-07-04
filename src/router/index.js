@@ -12,12 +12,12 @@ export default new Router({
         },
         {
             path: '/',
-            component: resolve => require(['../components/common/Home.vue'], resolve),
-            meta: { title: '自述文件' },
+            component: resolve => require(['@/components/common/Home.vue'], resolve),
+            meta: { title: '系统首页' },
             children:[
                 {
                     path: '/home',
-                    component: resolve => require(['../components/page/Dashboard.vue'], resolve),
+                    component: resolve => require(['@/view/home.vue'], resolve),
                     meta: { title: '系统首页' }
                 },
                 {
@@ -99,12 +99,6 @@ export default new Router({
                     path: '/article-detail',
                     component: resolve => require(['@/view/article/article-detail.vue'], resolve),
                     meta: { title: '文章详情' }
-                },
-                {
-                    // markdown组件
-                    path: '/markdown',
-                    component: resolve => require(['../components/page/Markdown.vue'], resolve),
-                    meta: { title: 'markdown编辑器' }    
                 },
                 {
                     path: '/404',
