@@ -20,19 +20,19 @@ const user = {
         },
         setName: (state, username) => {
             state.username = username;
-            VueCookies.set('username', username);
+            VueCookies.set('username', username, 1);
         },
         setHeadUrl: (state, headUrl) => {
             state.headUrl = headUrl;
-            VueCookies.set('headUrl', headUrl);
+            VueCookies.set('headUrl', headUrl, 1);
         },
         setEmail: (state, email) => {
             state.email = email;
-            VueCookies.set('email', email);
+            VueCookies.set('email', email, 1);
         },
         setLoginAt: (state, login_at) => {
             state.login_at = login_at;
-            VueCookies.set('login_at', login_at);
+            VueCookies.set('login_at', login_at, 1);
         }
     },
 
@@ -45,9 +45,9 @@ const user = {
                     commit('setAccessToken', data.access_token);
                     commit('setRefreshToken', data.access_token);
                     commit('setTokentype', data.token_type);
-                    VueCookies.set('access_token', data.access_token, data.expires_in);
-                    VueCookies.set('refresh_token', data.refresh_token);
-                    VueCookies.set('token_type', data.token_type);
+                    VueCookies.set('access_token', data.access_token, 1);
+                    VueCookies.set('refresh_token', data.refresh_token, 1);
+                    VueCookies.set('token_type', data.token_type, 1);
                     resolve(data);
                 }).catch(error => {
                     reject(error)
