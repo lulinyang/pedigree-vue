@@ -34,12 +34,6 @@
         </el-table>
       </div>
       <div style="text-align: center;padding-top: 20px">
-        <!-- <el-pagination 
-          background 
-          layout="prev, pager, next" 
-          :total="total" 
-          :page-size="8"
-        @current-change="changeCurrent"></el-pagination>-->
         <el-pagination
           background
           @current-change="changeCurrent"
@@ -87,7 +81,6 @@
 
 <script>
 import http from "@/http/server/api";
-import { truncate } from "fs";
 import { setTimeout } from "timers";
 export default {
   data() {
