@@ -5,8 +5,8 @@ if (/127.0.0.1/g.test(host) || /localhost/g.test(host) || /www.zupu.com/g.test(h
   baseUrl = 'http://api.com';
   ueBaseUrl = 'http://ueditor.up.com/';
 } else {
-  baseUrl = 'http://api.com';
-  ueBaseUrl = 'http://ueditor.up.com/';
+  baseUrl = 'http://api.lyang.top';
+  ueBaseUrl = 'http://admin.lyang.top/';
 }
 
 const toolbars = [

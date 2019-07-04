@@ -4,6 +4,7 @@ node_modules
 example.html
 favicon.ico
 /public/ueditor
+package-lock.json
 # local env files
 .env.local
 .env.*.local
