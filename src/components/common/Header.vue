@@ -133,7 +133,7 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           const param = {
-            password: that.pwd.newpwd,
+            newpwd: that.pwd.newpwd,
             oldpwd: that.pwd.oldpwd,
             id: that.info.id
           };
