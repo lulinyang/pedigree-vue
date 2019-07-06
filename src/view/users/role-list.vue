@@ -82,6 +82,7 @@
 <script>
 import http from "@/http/server/api";
 import { setTimeout } from "timers";
+import { Promise, reject } from "q";
 export default {
   data() {
     return {
@@ -139,7 +140,6 @@ export default {
           http
             .addRole(that.role)
             .then(res => {
-              console.log("res", res.data);
               if (res.data.original && res.data.original.created) {
                 that.isShow = false;
                 that.getList();
@@ -164,22 +164,40 @@ export default {
     showPower(item) {
       this.role = item ? item : {};
       const that = this;
-      http
-        .getNodesGetTree({})
-        .then(res => {
-          console.log("res.data", res.data);
-          that.nodeAll = res.data;
-        })
-        .catch(res => {});
-      this.isShowPower = true;
-      setTimeout(() => {
-        var permission_ids = item.permission_id;
-        var arr = [];
-        if (permission_ids != null) {
-          arr = permission_ids.split(",");
-        }
-        this.$refs.tree.setCheckedKeys(arr);
-      }, 100);
+      const parentNodes = [];
+      new Promise((resolve, reject) => {
+        http
+          .getNodesGetTree({})
+          .then(res => {
+            that.nodeAll = res.data;
+            that.nodeAll.forEach(val => {
+              if (val.children.length > 0) {
+                parentNodes.push(val.id);
+              }
+            });
+            resolve(parentNodes);
+          })
+          .catch(res => {
+            reject(res);
+          });
+      }).then(res => {
+        that.isShowPower = true;
+        setTimeout(() => {
+          var permission_ids = item.permission_id;
+          var arr = [];
+          if (permission_ids != null && permission_ids != "") {
+            arr = permission_ids.split(",");
+            let keys = [];
+
+            arr.forEach(id => {
+              if (parentNodes.toString().indexOf(id) === -1) {
+                keys.push(id);
+              }
+            });
+            that.$refs.tree.setCheckedKeys(keys);
+          }
+        }, 100);
+      });
     },
     getCheckedKeys() {
       const that = this;
