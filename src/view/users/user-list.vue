@@ -72,7 +72,11 @@
         <el-form-item label="密码" prop="password" style="width: 350px;" v-if="!user.id">
           <el-input v-model="user.password" type="password"></el-input>
         </el-form-item>
-        <el-form-item label="角色" prop="role_id" style="width: 350px;">
+        <el-form-item 
+          label="角色" 
+          prop="role_id" 
+          style="width: 350px;"
+          v-if="this.$store.state.user.username === 'admin'">
           <el-select v-model="user.role_id" filterable placeholder="请选择">
             <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
