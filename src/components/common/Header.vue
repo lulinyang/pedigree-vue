@@ -151,6 +151,8 @@ export default {
           if (res.data.original && res.data.original.updated) {
             this.isShow = false;
             this.isPwd = false;
+            // this.$store.state.user.headUrl = this.info.headUrl;
+            this.$store.commit('setHeadUrl', this.info.headUrl);
             this.$message.success("修改成功！");
           } else if (res.data.original && res.data.original.find) {
             this.$message.error(res.data.original.message);
