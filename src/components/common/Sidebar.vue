@@ -65,11 +65,9 @@ export default {
     http
       .getJurisdiction({})
       .then(res => {
-        this.items = res.data;
+        console.log('res', res);
+        this.items = res.data.data;
       })
-      .catch(res => {
-        console.log("error", res);
-      });
     // 通过 Event Bus 进行组件间通信，来折叠侧边栏
     bus.$on("collapse", msg => {
       this.collapse = msg;

@@ -17,6 +17,7 @@
     "vue-cookies": "^1.5.13",
     "vue-cropperjs": "^3.0.0",
     "vue-i18n": "^8.10.0",
+    "vue-neditor-wrap": "^1.0.4",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.1",
     "vue-schart": "^1.0.0",

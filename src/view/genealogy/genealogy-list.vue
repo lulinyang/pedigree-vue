@@ -6,7 +6,7 @@
           <el-form-item label="区域姓氏">
             <el-input v-model="keywords.area_surname" placeholder="区域姓氏"></el-input>
           </el-form-item>
-           <el-form-item label="描述">
+          <el-form-item label="描述">
             <el-input v-model="keywords.describe" placeholder="请输入描述"></el-input>
           </el-form-item>
           <el-form-item label="创建人">
@@ -17,36 +17,39 @@
           </el-form-item>
         </el-form>
       </div>
-      <div>
-        <el-table :data="surnamList" border style="width: 100%">
-          <el-table-column prop="area_surname" label="区域姓氏" width="150"></el-table-column>
-          <el-table-column label="缩略图" width="90">
-            <template slot-scope="scope">
-              <el-image :src="baseUrl + scope.row.thumbnail"></el-image>
-            </template>
-          </el-table-column>
-          <el-table-column prop="describe" label="描述" width="180"></el-table-column>
-          <el-table-column prop="username" label="创建人"></el-table-column>
-          <el-table-column prop="created_at" label="创建时间"></el-table-column>
-          <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-          <el-table-column label="操作" width="200">
-            <template slot-scope="scope">
-              <el-row>
-                <el-button
-                  type="primary"
-                  icon="el-icon-edit"
-                  @click="editGenealogy(scope.row.id)"
-                >编辑</el-button>
-                <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
-              </el-row>
-              <el-row style="margin-top: 8px">
-                <el-button type="info" @click="seeDetail(scope.row.id)">简介</el-button>
-                <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
-              </el-row>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
+      <el-row style="margin-bottom: 15px">
+        <el-col :span="24">
+          <div>
+            <el-button type="primary" icon="el-icon-plus" @click="jumpPage('add')">新增族谱</el-button>
+          </div>
+        </el-col>
+      </el-row>
+
+      <el-table :data="list" border style="width: 100%">
+        <el-table-column prop="area_surname" label="区域姓氏" width="150"></el-table-column>
+        <el-table-column label="缩略图" width="90">
+          <template slot-scope="scope">
+            <el-image :src="baseUrl + scope.row.thumbnail"></el-image>
+          </template>
+        </el-table-column>
+        <el-table-column prop="describe" label="描述" width="180"></el-table-column>
+        <el-table-column prop="username" label="创建人"></el-table-column>
+        <el-table-column prop="created_at" label="创建时间"></el-table-column>
+        <el-table-column prop="updated_at" label="更新时间"></el-table-column>
+        <el-table-column label="查看" width="200">
+          <template slot-scope="scope">
+            <el-button type="info" @click="seeDetail(scope.row.id)">简介</el-button>
+            <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="200">
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" @click="jumpPage('edit', scope.row.id)">编辑</el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
       <div style="text-align: center;padding-top: 20px">
         <el-pagination
           background
@@ -65,7 +68,6 @@
 <script>
 import http from "@/http/server/api";
 import config from "@/config/index";
-// import memberListVue from './member-list.vue';
 export default {
   data() {
     return {
@@ -74,7 +76,7 @@ export default {
         page: 1,
         pageSize: 8
       },
-      surnamList: [],
+      list: [],
       total: 0,
       baseUrl: config.baseUrl
     };
@@ -85,7 +87,7 @@ export default {
   methods: {
     seePedigree(id) {
       this.$router.push({
-        path: "pedigree-list",
+        path: "/pedigree-list",
         query: {
           id: id
         }
@@ -96,29 +98,30 @@ export default {
     },
     getList() {
       const that = this;
-      http
-        .getGenealogyList(this.keywords)
-        .then(res => {
-          that.surnamList = res.data.data;
-          that.total = res.data.total;
-        })
-        .catch(res => {});
+      http.getGenealogyList(this.keywords).then(res => {
+        that.list = res.data.data.data;
+        that.total = res.data.total.data;
+      });
     },
     changeCurrent(page) {
       this.keywords.page = page;
       this.getList();
     },
-     handleSizeChange(pageSize) {
+    handleSizeChange(pageSize) {
       this.keywords.pageSize = pageSize;
       this.getList();
     },
-    editGenealogy(id) {
-      this.$router.push({
-        path: "/genealogy-edit",
-        query: {
-          id: id
-        }
-      });
+    jumpPage(page, id = "") {
+      if (page === "add") {
+        this.$router.push("/genealogy-add");
+      } else {
+        this.$router.push({
+          path: "/genealogy-edit",
+          query: {
+            id: id
+          }
+        });
+      }
     },
     seeDetail(id) {
       this.$router.push({

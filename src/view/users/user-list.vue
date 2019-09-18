@@ -22,7 +22,7 @@
         </el-col>
       </el-row>
       <div>
-        <el-table :data="userlist" border style="width: 100%">
+        <el-table :data="list" border style="width: 100%">
           <el-table-column prop="username" label="姓名" width="150"></el-table-column>
           <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
           <el-table-column prop="orgname" label="机构名" width="180"></el-table-column>
@@ -45,7 +45,7 @@
           :total="total"
           :page-size="8"
           @current-change="changeCurrent"
-        ></el-pagination> -->
+        ></el-pagination>-->
         <el-pagination
           background
           @current-change="changeCurrent"
@@ -72,11 +72,12 @@
         <el-form-item label="密码" prop="password" style="width: 350px;" v-if="!user.id">
           <el-input v-model="user.password" type="password"></el-input>
         </el-form-item>
-        <el-form-item 
-          label="角色" 
-          prop="role_id" 
+        <el-form-item
+          label="角色"
+          prop="role_id"
           style="width: 350px;"
-          v-if="this.$store.state.user.username === 'admin'">
+          v-if="this.$store.state.user.username === 'admin'"
+        >
           <el-select v-model="user.role_id" filterable placeholder="请选择">
             <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
@@ -95,7 +96,7 @@ import http from "@/http/server/api";
 export default {
   data() {
     return {
-      userlist: [],
+      list: [],
       keywords: {
         username: "",
         email: "",
@@ -126,14 +127,14 @@ export default {
       this.getList();
     },
     getList() {
-      const that = this;
       http
         .getUserList(this.keywords)
         .then(res => {
-          that.userlist = res.data.data;
-          that.total = res.data.total;
+          if (res.data.code === 200) {
+            this.list = res.data.data.data;
+            this.total = res.data.data.total;
+          }
         })
-        .catch(res => {});
     },
     changeCurrent(page) {
       this.keywords.page = page;
@@ -144,35 +145,29 @@ export default {
       this.getList();
     },
     addUser(formName) {
-      const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
           http
-            .saveUser(that.user)
+            .saveUser(this.user)
             .then(res => {
-              if (res.data.original && res.data.original.created) {
-                that.isShow = false;
-                that.getList();
-                this.$message.success("新增成功！");
-              } else if (res.data.original && res.data.original.updated) {
-                that.isShow = false;
-                this.$message.success("修改成功！");
-              } else if (res.data.original && res.data.original.find) {
-                this.$message.error(res.data.original.message);
-              } else {
-                this.$message.error("添加失败！");
+              if(res.data.code === 200) {
+                this.isShow = false;
+                this.getList();
+                this.$message.success(res.data.stateMsg);
               }
             })
-            .catch(res => {});
         }
       });
     },
     showModal(item) {
-      const that = this;
       this.user = item ? item : {};
       this.isShow = true;
-      http.getRolesAll().then(res => {
-        that.roles = res.data;
+      http.getRolesAll({}).then(res => {
+        if(res.data.code === 200) {
+          this.roles = res.data.data;
+        }else {
+          this.roles = [];
+        }
       });
     },
     showDel(item) {
@@ -192,20 +187,15 @@ export default {
       const param = {
         id: item.id,
         orgcode: item.orgcode
-      }
+      };
       http
         .deleteUser(param)
         .then(res => {
-          if (res.data.result) {
-            this.$message.success(res.data.message);
+          if (res.data.code === 200) {
+            this.$message.success(res.data.stateMsg);
             this.getList();
-          } else {
-            this.$message.error(res.data.message);
           }
         })
-        .catch(res => {
-          this.$message.error("删除失败!");
-        });
     }
   }
 };

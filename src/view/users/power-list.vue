@@ -10,7 +10,7 @@
       </el-row>
       <div>
         <el-table
-          :data="nodelist"
+          :data="list"
           style="width: 100%;margin-bottom: 20px;"
           row-key="id"
           border
@@ -44,7 +44,6 @@
       </div>
     </el-card>
 
-
     <el-dialog :title="nodes.id ? '修改' : '新增'" :visible.sync="isShow" width="500px">
       <el-form ref="formNode" :model="nodes" :rules="rules" label-width="120px">
         <el-form-item label="节点名称" prop="name" style="width: 350px;">
@@ -52,7 +51,7 @@
         </el-form-item>
         <!-- <el-form-item label="后端路由" style="width: 350px;">
           <el-input v-model="nodes.router"></el-input>
-        </el-form-item> -->
+        </el-form-item>-->
         <el-form-item label="前端路由" style="width: 350px;">
           <el-input v-model="nodes.index"></el-input>
         </el-form-item>
@@ -63,7 +62,12 @@
           <el-input v-model="nodes.sort"></el-input>
         </el-form-item>
         <el-form-item label="父节点">
-          <el-select v-model="nodes.pidLevel" filterable placeholder="请选择节点层级" :disabled="nodes.id ? true : false">
+          <el-select
+            v-model="nodes.pidLevel"
+            filterable
+            placeholder="请选择节点层级"
+            :disabled="nodes.id ? true : false"
+          >
             <el-option label="顶级节点" value="0-0"></el-option>
             <el-option
               v-for="item in nodeAll"
@@ -88,7 +92,7 @@ import { truncate } from "fs";
 export default {
   data() {
     return {
-      nodelist: [],
+      list: [],
       nodes: {},
       isShow: false,
       rules: {
@@ -96,7 +100,7 @@ export default {
       },
       nodeAll: [],
       total: 0,
-      sortMessage: ''
+      sortMessage: ""
     };
   },
   created() {
@@ -108,7 +112,7 @@ export default {
       http
         .addNode(item)
         .then(res => {
-         if (res.data.original && res.data.original.updated) {
+          if (res.data.original && res.data.original.updated) {
             // that.isShow = false;
             // this.$message.success("修改成功！");
           } else {
@@ -118,37 +122,25 @@ export default {
         .catch(res => {});
     },
     getList() {
-      const that = this;
-      http
-        .getNodesGetTree({})
-        .then(res => {
-          that.nodelist = res.data;
-        })
-        .catch(res => {});
+      http.getNodesGetTree({}).then(res => {
+        this.list = res.data.data;
+      });
     },
     addNodes(formName) {
       const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if(isNaN(that.nodes.sort)) {
+          if (isNaN(that.nodes.sort)) {
             that.sortMessage = "排序值不是一个数值！";
             return false;
           }
-          http
-            .addNode(that.nodes)
-            .then(res => {
-              if (res.data.original && res.data.original.created) {
-                that.isShow = false;
-                that.getList();
-                this.$message.success("新增成功！");
-              } else if (res.data.original && res.data.original.updated) {
-                that.isShow = false;
-                this.$message.success("修改成功！");
-              } else {
-                this.$message.error("添加失败！");
-              }
-            })
-            .catch(res => {});
+          http.addNode(that.nodes).then(res => {
+            if (res.data.code === 200) {
+              this.isShow = false;
+              this.getList();
+              this.$message.success(res.data.stateMsg);
+            }
+          });
         }
       });
     },
@@ -165,9 +157,8 @@ export default {
       http
         .getNodesAll({})
         .then(res => {
-          that.nodeAll = res.data;
+          that.nodeAll = res.data.data;
         })
-        .catch(res => {});
     },
     showDel(item) {
       this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
@@ -181,7 +172,6 @@ export default {
             return false;
           }
           this.deleteNode(item);
-          // this.$message.success("删除成功!");
         })
         .catch(() => {
           this.$message.info("已取消删除!");
@@ -191,17 +181,11 @@ export default {
       http
         .deleteNode({ id: item.id })
         .then(res => {
-          console.log("success", res);
-          if (res.data.result) {
-            this.$message.success(res.data.message);
+          if (res.data.code === 200) {
+            this.$message.success(res.data.stateMsg);
             this.getList();
-          } else {
-            this.$message.error(res.data.message);
           }
         })
-        .catch(res => {
-          this.$message.error("删除失败!");
-        });
     }
   }
 };

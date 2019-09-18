@@ -53,7 +53,6 @@ export default {
 
   data() {
     return {
-      id: "",
       genealogy: {},
       isShowImg: true,
       baseUrl: config.baseUrl,
@@ -72,25 +71,18 @@ export default {
     };
   },
   created() {
-    this.id = this.$route.query.id;
-    if (this.id != "") {
-      const that = this;
-      http
-        .getGenealogy({ id: this.id })
-        .then(res => {
-          if (res.data.code == "200") {
-            if (res.data.result.thumbnail) {
-              this.isShowImg = false;
-            }
-            res.data.result.brief_introduction =
-              res.data.result.brief_introduction == null
-                ? " "
-                : res.data.result.brief_introduction;
-            that.genealogy = res.data.result;
-          }
-        })
-        .catch(res => {});
-    }
+    http.getGenealogy({ id: this.$route.query.id }).then(res => {
+      if (res.data.code === 200) {
+        if (res.data.result.thumbnail) {
+          this.isShowImg = false;
+        }
+        res.data.result.brief_introduction =
+          res.data.result.brief_introduction == null
+            ? ""
+            : res.data.result.brief_introduction;
+        this.genealogy = res.data.result;
+      }
+    });
   },
   methods: {
     ready(editorInstance) {
@@ -103,25 +95,15 @@ export default {
       );
     },
     onSubmit(formName) {
-      const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          http
-            .addGenealogy(that.genealogy)
-            .then(res => {
-              if (res.data.original && res.data.original.created) {
-                this.$message.success("新增成功！");
-                this.$router.push("/genealogy-list");
-              } else if (res.data.original && res.data.original.updated) {
-                this.$message.success("修改成功！");
-                this.$router.push("/genealogy-list");
-              } else {
-                this.$message.error("添加失败！");
-              }
-            })
-            .catch(res => {});
-        } else {
-          this.$message.error("区域姓氏必填！");
+          http.addGenealogy(that.genealogy).then(res => {
+            if (res.data.code === 200) {
+              this.isShow = false;
+              this.getList();
+              this.$message.success(res.data.stateMsg);
+            }
+          });
         }
       });
     },
@@ -129,14 +111,12 @@ export default {
       if (res.res) {
         this.genealogy.thumbnail = res.url;
         this.isShowImg = false;
-        // console.log(URL.createObjectURL(file.raw));
       } else {
         this.$message.error("上传失败！");
       }
     }
   },
   destroyed() {
-    console.log("将editor进行销毁");
     this.destroy = true;
   }
 };

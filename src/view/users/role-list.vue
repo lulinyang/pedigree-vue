@@ -19,7 +19,7 @@
         </el-col>
       </el-row>
       <div>
-        <el-table :data="rolelist" border style="width: 100%">
+        <el-table :data="list" border style="width: 100%">
           <el-table-column prop="name" label="角色名" width="180"></el-table-column>
           <el-table-column prop="description" label="描述"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
@@ -46,7 +46,7 @@
       </div>
     </el-card>
 
-    <el-dialog :title="role.id ? '修改' : '新增'" :visible.sync="isShow" width="500px">
+    <el-dialog :title="role.id ? '修改' : '新增'" :visible.sync="isShow" width="50%">
       <el-form ref="formRole" :model="role" :rules="rules" label-width="120px">
         <el-form-item label="角色名" prop="name" style="width: 350px;">
           <el-input v-model="role.name"></el-input>
@@ -61,7 +61,7 @@
       </el-form>
     </el-dialog>
 
-    <el-dialog title="分配权限" :visible.sync="isShowPower" width="400px">
+    <el-dialog title="分配权限" :visible.sync="isShowPower" width="40%">
       <el-tree
         :data="nodeAll"
         show-checkbox
@@ -86,7 +86,7 @@ import { Promise, reject } from "q";
 export default {
   data() {
     return {
-      rolelist: [],
+      list: [],
       keywords: {
         name: "",
         page: 1,
@@ -124,36 +124,23 @@ export default {
       this.getList();
     },
     getList() {
-      const that = this;
-      http
-        .getRoles(that.keywords)
-        .then(res => {
-          that.rolelist = res.data.data;
-          that.total = res.data.total;
-        })
-        .catch(res => {});
+      http.getRoles(this.keywords).then(res => {
+        if (res.data.code) {
+          this.list = res.data.data.data;
+          this.total = res.data.data.total;
+        }
+      });
     },
     addRole(formName) {
-      const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          http
-            .addRole(that.role)
-            .then(res => {
-              if (res.data.original && res.data.original.created) {
-                that.isShow = false;
-                that.getList();
-                this.$message.success("新增成功！");
-              } else if (res.data.original && res.data.original.updated) {
-                that.isShow = false;
-                this.$message.success("修改成功！");
-              } else if (res.data.original && res.data.original.find) {
-                this.$message.error("角色名重复！");
-              } else {
-                this.$message.error("添加失败！");
-              }
-            })
-            .catch(res => {});
+          http.addRole(this.role).then(res => {
+            if (res.data.code === 200) {
+              this.isShow = false;
+              this.getList();
+              this.$message.success(res.data.stateMsg);
+            }
+          });
         }
       });
     },
@@ -169,7 +156,7 @@ export default {
         http
           .getNodesGetTree({})
           .then(res => {
-            that.nodeAll = res.data;
+            that.nodeAll = res.data.data;
             that.nodeAll.forEach(val => {
               if (val.children.length > 0) {
                 parentNodes.push(val.id);
@@ -211,14 +198,13 @@ export default {
       http
         .updateRolePower(params)
         .then(res => {
-          if (res.data.original && res.data.original.updated) {
+          if (res.data.code === 200) {
             this.isShowPower = false;
             this.keywords.page = 1;
             that.getList();
-            this.$message.success("操作成功！");
+            this.$message.success(res.data.stateMsg);
           }
         })
-        .catch(res => {});
     },
     showDel(item) {
       this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
@@ -237,16 +223,11 @@ export default {
       http
         .deleteRole({ id: item.id })
         .then(res => {
-          if (res.data.result) {
-            this.$message.success(res.data.message);
+          if (res.data.code === 200) {
+            this.$message.success(res.data.stateMsg);
             this.getList();
-          } else {
-            this.$message.error(res.data.message);
           }
         })
-        .catch(res => {
-          this.$message.error("删除失败!");
-        });
     }
   }
 };

@@ -1,4 +1,4 @@
-import extendsApi from '../extendsApi'
+import extendsApi from './extendsApi'
 
 class AllServiceApi extends extendsApi {
   constructor() {

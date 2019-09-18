@@ -7,7 +7,7 @@ module.exports = {
                 target:'http://api.com',
                 changeOrigin:true,
                 pathRewrite:{
-                    '/api':''
+                    '^/api':''
                 }
             },
             '/ms':{
@@ -15,7 +15,7 @@ module.exports = {
                 changeOrigin: true
             }
         },
-        port: 3000,
+        port: 4000,
         disableHostCheck: true
     }
 }

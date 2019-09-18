@@ -4,7 +4,7 @@ import store from '@/store/index'
 import config from '@/config/index'
 import VueCookies from 'vue-cookies'
 import { Loading, Message } from 'element-ui'
-import router from '../router/index';
+import router from '../../router/index';
 
 let loading;
 function startLoading() {    //使用Element loading-start 方法
@@ -38,7 +38,10 @@ creatAxios.interceptors.request.use(configData => { // 请求拦截 在发送请
 })
 
 creatAxios.interceptors.response.use(response => { // 响应拦截 对响应数据做点什么
-  // endLoading();
+  if(response.data.code !== 200) {
+    Message.error(response.data.stateMsg);
+    return response;
+  }
   return response
 }, error => { // 响应失败做的事
   // endLoading();
