@@ -5,7 +5,7 @@
         <el-col :span="24">
           <div class="grid-content bg-purple-dark">
             <el-button type="primary" icon="el-icon-plus" @click="showModal(false)">新增族谱成员</el-button>
-						 <el-button type="primary"  @click="showTopology()">查看拓扑图</el-button>
+            <el-button type="primary" @click="showTopology()">查看拓扑图</el-button>
           </div>
         </el-col>
       </el-row>
@@ -18,19 +18,19 @@
           default-expand-all
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         >
-				<el-table-column prop="title" label="标题"  align="left"></el-table-column>
-          <el-table-column prop="sort" label="排序"  align="center"></el-table-column>
+          <el-table-column prop="title" label="标题" align="left"></el-table-column>
+          <el-table-column prop="sort" label="排序" align="center"></el-table-column>
           <!-- <el-table-column label="置顶">
             <template slot-scope="scope">
               <el-switch v-model="scope.row.top" @change="roofPlacement(scope.row)"></el-switch>
             </template>
-          </el-table-column> -->
+          </el-table-column>-->
           <el-table-column prop="created_at" label="创建时间" width="150"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间" width="150"></el-table-column>
-          <el-table-column label="操作" width="180">
+          <el-table-column label="操作" width="120" align="center">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
-              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button>
+              <el-button type="primary" icon="el-icon-edit" circle @click="showModal(scope.row)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle  @click="showDel(scope.row)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -76,7 +76,12 @@
           <el-input v-model="pedigree.sort"></el-input>
         </el-form-item>
         <el-form-item label="父辈" style="width: 520px;">
-          <el-select v-model="pedigree.pidLevel" filterable style="width: 400px;" :disabled="pedigree.id ? true : false">
+          <el-select
+            v-model="pedigree.pidLevel"
+            filterable
+            style="width: 400px;"
+            :disabled="pedigree.id ? true : false"
+          >
             <el-option label="第一代" value="0-0"></el-option>
             <el-option
               v-for="item in pedigreeAll"
@@ -104,9 +109,9 @@ export default {
       id: "",
       pedigreelist: [],
       pedigree: {
-				pidLevel: '0-0',
-				sort: 0
-			},
+        pidLevel: "0-0",
+        sort: 0
+      },
       isShow: false,
       memberAll: [],
       total: 0,
@@ -120,37 +125,29 @@ export default {
     };
   },
   created() {
-    this.id = this.$route.query.id;
+    this.id = this.$route.params.id;
     this.getList();
   },
   methods: {
-		showTopology() {
-			const that = this;
-			this.$router.push({
-        path: "pedigree-topology",
-        query: {
-          id: that.id
-				}
-			})
-		},
+    showTopology() {
+      const that = this;
+      this.$router.push(`/pedigree-topology/${this.id}`);
+    },
     selectMember(id) {
       http
         .getMember({ id, id })
         .then(res => {
-          if (res.data.code == 200) {
-            this.memberInfo = res.data.result;
-            if (
-              this.pedigree.mate_id != "" &&
-              this.memberInfo.sex == this.mateInfo.sex
-            ) {
-              this.$message.warning("不允许性别一样！");
-              this.$set(this.pedigree, "member_id", "");
-              return false;
-            }
-            this.$set(this.pedigree, "title", this.memberInfo.name);
+          this.memberInfo = res.data.result;
+          if (
+            this.pedigree.mate_id != "" &&
+            this.memberInfo.sex == this.mateInfo.sex
+          ) {
+            this.$message.warning("不允许性别一样！");
+            this.$set(this.pedigree, "member_id", "");
+            return false;
           }
+          this.$set(this.pedigree, "title", this.memberInfo.name);
         })
-        .catch(res => {});
     },
     selectMate(id) {
       if (!this.pedigree.member_id) {
@@ -158,45 +155,26 @@ export default {
         this.$set(this.pedigree, "mate_id", "");
         return false;
       }
-      http
-        .getMember({ id, id })
-        .then(res => {
-          if (res.data.code == 200) {
-            this.mateInfo = res.data.result;
-            if (this.memberInfo.sex == this.mateInfo.sex) {
-              this.$message.warning("不允许性别一样！");
-              this.$set(this.pedigree, "mate_id", "");
-              return false;
-            }
-            this.$set(
-              this.pedigree,
-              "title",
-              this.pedigree.title + "-" + this.mateInfo.name
-            );
-          }
-        })
-        .catch(res => {});
+      http.getMember({ id, id }).then(res => {
+        this.mateInfo = res.data.result;
+        if (this.memberInfo.sex == this.mateInfo.sex) {
+          this.$message.warning("不允许性别一样！");
+          this.$set(this.pedigree, "mate_id", "");
+          return false;
+        }
+        this.$set(
+          this.pedigree,
+          "title",
+          this.pedigree.title + "-" + this.mateInfo.name
+        );
+      });
     },
-    // roofPlacement(item) {
-    //   item.isTop = true;
-    //   http
-    //     .addPedigree(item)
-    //     .then(res => {
-    //       if (res.data.original && res.data.original.updated) {
-    //         // that.isShow = false;
-    //         // this.$message.success("修改成功！");
-    //       } else {
-    //         this.$message.error("置顶失败！");
-    //       }
-    //     })
-    //     .catch(res => {});
-    // },
     getList() {
       const that = this;
       http
         .getPedigreeTree({ surname_id: this.id })
         .then(res => {
-          that.pedigreelist = res.data;
+          that.pedigreelist = res.data.data;
         })
         .catch(res => {});
     },
@@ -207,14 +185,14 @@ export default {
           if (isNaN(that.pedigree.sort)) {
             that.sortMessage = "排序值不是一个数值！";
             return false;
-					}
+          }
 
-					if(that.id == "") {
-						this.$message.error("surname_id不能为空！");
-						return false;
-					}
+          if (that.id == "") {
+            this.$message.error("surname_id不能为空！");
+            return false;
+          }
 
-					that.pedigree.surname_id = that.id;
+          that.pedigree.surname_id = that.id;
           http
             .addPedigree(that.pedigree)
             .then(res => {
@@ -234,7 +212,7 @@ export default {
       });
     },
     showModal(item) {
-      this.pedigree = item ? item : { pidLevel: "0-0", sort: 0};
+      this.pedigree = item ? item : { pidLevel: "0-0", sort: 0 };
       if (item) {
         item.pidLevel = item.pid + "-" + item.level;
         this.pedigree = item;
@@ -248,9 +226,9 @@ export default {
         .then(res => {
           this.memberAll = res.data;
         })
-				.catch(res => {});
-			 http
-        .getPedigreeAll({surname_id: this.id})
+        .catch(res => {});
+      http
+        .getPedigreeAll({ surname_id: this.id })
         .then(res => {
           this.pedigreeAll = res.data;
         })
@@ -276,7 +254,7 @@ export default {
     },
     deletePedigree(item) {
       http
-        .deletePedigree({ id: item.id, surname_id: this.id})
+        .deletePedigree({ id: item.id, surname_id: this.id })
         .then(res => {
           console.log("success", res);
           if (res.data.result) {

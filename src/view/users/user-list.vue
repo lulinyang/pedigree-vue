@@ -22,7 +22,7 @@
         </el-col>
       </el-row>
       <div>
-        <el-table :data="list" border style="width: 100%">
+        <el-table :data="list" style="width: 100%">
           <el-table-column prop="username" label="姓名" width="150"></el-table-column>
           <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
           <el-table-column prop="orgname" label="机构名" width="180"></el-table-column>
@@ -30,10 +30,10 @@
           <el-table-column prop="login_at" label="上次登录时间"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-          <el-table-column label="操作" width="180">
+          <el-table-column label="操作" width="120" align="center">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
-              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button>
+              <el-button type="primary" icon="el-icon-edit" circle @click="showModal(scope.row)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -127,14 +127,10 @@ export default {
       this.getList();
     },
     getList() {
-      http
-        .getUserList(this.keywords)
-        .then(res => {
-          if (res.data.code === 200) {
-            this.list = res.data.data.data;
-            this.total = res.data.data.total;
-          }
-        })
+      http.getUserList(this.keywords).then(res => {
+        this.list = res.data.data.data;
+        this.total = res.data.data.total;
+      });
     },
     changeCurrent(page) {
       this.keywords.page = page;
@@ -147,15 +143,11 @@ export default {
     addUser(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          http
-            .saveUser(this.user)
-            .then(res => {
-              if(res.data.code === 200) {
-                this.isShow = false;
-                this.getList();
-                this.$message.success(res.data.stateMsg);
-              }
-            })
+          http.saveUser(this.user).then(res => {
+            this.isShow = false;
+            this.getList();
+            this.$message.success(res.data.stateMsg);
+          });
         }
       });
     },
@@ -163,11 +155,7 @@ export default {
       this.user = item ? item : {};
       this.isShow = true;
       http.getRolesAll({}).then(res => {
-        if(res.data.code === 200) {
-          this.roles = res.data.data;
-        }else {
-          this.roles = [];
-        }
+        this.roles = res.data.data;
       });
     },
     showDel(item) {
@@ -188,14 +176,10 @@ export default {
         id: item.id,
         orgcode: item.orgcode
       };
-      http
-        .deleteUser(param)
-        .then(res => {
-          if (res.data.code === 200) {
-            this.$message.success(res.data.stateMsg);
-            this.getList();
-          }
-        })
+      http.deleteUser(param).then(res => {
+        this.$message.success(res.data.stateMsg);
+        this.getList();
+      });
     }
   }
 };

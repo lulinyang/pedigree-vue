@@ -8,6 +8,7 @@
         <el-upload
           class="avatar-uploader"
           name="img"
+          :headers="headers"
           :action="upImgageUrl"
           :show-file-list="false"
           :on-success="handleThumbnailSuccess"
@@ -26,13 +27,12 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="简介">
-        <vue-ueditor-wrap
+        <vue-neditor-wrap
           v-model="genealogy.brief_introduction"
-          :destroy="destroy"
-          :config="config"
+          :config="myConfig"
+          :destroy="false"
           @ready="ready"
-          style="width: 800px"
-        ></vue-ueditor-wrap>
+        ></vue-neditor-wrap>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit('genealogyForm')">{{ id == '' ? '立即创建' : '保存'}}</el-button>
@@ -42,28 +42,21 @@
   </el-card>
 </template>
 <script>
-import VueUeditorWrap from "vue-ueditor-wrap";
+import editor from "@/config/editor";
 import config from "@/config/index";
 import http from "@/http/server/api";
 import { setTimeout } from "timers";
 export default {
-  components: {
-    VueUeditorWrap
-  },
-
   data() {
     return {
+      id: '',
       genealogy: {},
       isShowImg: true,
       baseUrl: config.baseUrl,
       upImgageUrl: config.baseUrl + "/api/upImage",
-      destroy: false,
-      config: {
-        autoHeightEnabled: false,
-        initialFrameHeight: 500,
-        initialFrameWidth: "100%",
-        serverUrl: config.ueBaseUrl + "/static/UEditor/php/controller.php",
-        toolbars: config.toolbars
+      myConfig: editor.myConfig,
+      headers: {
+        "Authorization": this.$store.getters.token_type + ' ' + this.$store.getters.access_token
       },
       rules: {
         area_surname: [{ required: true, message: "区域姓氏", trigger: "blur" }]
@@ -71,53 +64,41 @@ export default {
     };
   },
   created() {
-    http.getGenealogy({ id: this.$route.query.id }).then(res => {
-      if (res.data.code === 200) {
-        if (res.data.result.thumbnail) {
-          this.isShowImg = false;
-        }
-        res.data.result.brief_introduction =
-          res.data.result.brief_introduction == null
-            ? ""
-            : res.data.result.brief_introduction;
-        this.genealogy = res.data.result;
+    this.id = this.$route.params.id;
+    http.getGenealogy({ id: this.$route.params.id }).then(res => {
+      if (res.data.data.thumbnail) {
+        this.isShowImg = false;
       }
+      res.data.data.brief_introduction =
+        res.data.data.brief_introduction == null
+          ? ""
+          : res.data.data.brief_introduction;
+      this.genealogy = res.data.data;
     });
   },
   methods: {
-    ready(editorInstance) {
-      console.log(`实例${editorInstance.key}已经初始化:`, editorInstance);
-    },
-    addCustomUI(editorId, editorConfig) {
-      console.log(
-        editorId + "的配置参数是:",
-        JSON.stringify(editorConfig, null, 2)
-      );
+    ready(editorSetting) {
+      // console.log("editorSetting", editorSetting);
     },
     onSubmit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          http.addGenealogy(that.genealogy).then(res => {
-            if (res.data.code === 200) {
-              this.isShow = false;
-              this.getList();
-              this.$message.success(res.data.stateMsg);
-            }
+          http.addGenealogy(this.genealogy).then(res => {
+            this.$router.go(-1);
+            this.$message.success(res.data.stateMsg);
           });
         }
       });
     },
     handleThumbnailSuccess(res, file) {
-      if (res.res) {
-        this.genealogy.thumbnail = res.url;
+      // console.log('res.code', res ,res.code);
+      if (res.code *10/10 == 200) {
+        this.genealogy.thumbnail = res.data;
         this.isShowImg = false;
       } else {
         this.$message.error("上传失败！");
       }
     }
-  },
-  destroyed() {
-    this.destroy = true;
   }
 };
 </script>

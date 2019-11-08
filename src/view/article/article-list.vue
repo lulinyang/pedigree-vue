@@ -29,6 +29,13 @@
           </el-form-item>
         </el-form>
       </div>
+       <el-row style="margin-bottom: 15px">
+        <el-col :span="24">
+          <div>
+            <el-button type="primary" icon="el-icon-plus" @click="jumpPage('add')">添加文章</el-button>
+          </div>
+        </el-col>
+      </el-row>
       <div>
         <el-table :data="arcticleList" border style="width: 100%">
           <el-table-column prop="title" label="标题" width="200"></el-table-column>
@@ -41,13 +48,16 @@
           <el-table-column prop="describe" label="描述" width="240"></el-table-column>
           <el-table-column prop="create_user" label="创建人"></el-table-column>
           <el-table-column prop="update_user" label="更新人"></el-table-column>
-          <el-table-column prop="created_at" label="创建时间"></el-table-column>
-          <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-          <el-table-column label="操作" width="270">
+          <el-table-column prop="created_at" label="创建时间" width="180"></el-table-column>
+          <el-table-column prop="updated_at" label="更新时间" width="180"></el-table-column>
+          <el-table-column label="操作" width="150" align="center">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="editArcticl(scope.row.id)">编辑</el-button>
+               <el-button type="primary" icon="el-icon-edit" circle @click="jumpPage('edit',scope.row.id)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row.id)"></el-button>
+              <el-button type="info" icon="el-icon-info" circle @click="showDetail(scope.row.id)"></el-button>
+              <!-- <el-button type="primary" icon="el-icon-edit" @click="editArcticl(scope.row.id)">编辑</el-button>
               <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
-              <el-button type="success" @click="showDetail(scope.row.id)">文章详情</el-button>
+              <el-button type="success" @click="showDetail(scope.row.id)">文章详情</el-button> -->
             </template>
           </el-table-column>
         </el-table>
@@ -78,7 +88,7 @@ export default {
         title: "",
         page: 1,
         pageSize: 8,
-        type: ''
+        type: ""
       },
       arcticleList: [],
       total: 0,
@@ -87,16 +97,19 @@ export default {
     };
   },
   created() {
-    http
-      .getColumnList({})
-      .then(res => {
-        this.columnlist = res.data.data;
-        console.log("this.columnlist", this.columnlist);
-      })
-      .catch(res => {});
+    http.getColumnList({}).then(res => {
+      this.columnlist = res.data.data.data;
+    });
     this.getList();
   },
   methods: {
+    jumpPage(page, id = "") {
+      if (page === "add") {
+        this.$router.push("/article-add");
+      } else {
+        this.$router.push(`/article-edit/${id}`);
+      }
+    },
     search() {
       this.getList();
     },
@@ -105,8 +118,8 @@ export default {
       http
         .getArcticlList(this.keywords)
         .then(res => {
-          that.arcticleList = res.data.data;
-          that.total = res.data.total;
+          that.arcticleList = res.data.data.data;
+          that.total = res.data.data.total;
         })
         .catch(res => {});
     },
@@ -117,14 +130,6 @@ export default {
     handleSizeChange(pageSize) {
       this.keywords.pageSize = pageSize;
       this.getList();
-    },
-    editArcticl(id) {
-      this.$router.push({
-        path: "/article-edit",
-        query: {
-          id: id
-        }
-      });
     },
     showDel(id) {
       const that = this;
@@ -149,12 +154,7 @@ export default {
         });
     },
     showDetail(id) {
-      this.$router.push({
-        path: "/article-detail",
-        query: {
-          id: id
-        }
-      });
+      this.$router.push(`/article-detail/${id}`);
     }
   }
 };

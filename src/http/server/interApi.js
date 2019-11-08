@@ -24,10 +24,9 @@ const creatAxios = axios.create({
 
 // 拦截器配置
 creatAxios.interceptors.request.use(configData => { // 请求拦截 在发送请求之前做些什么
-  // startLoading();
   if (!/\/oauth\/token/g.test(configData.url)) {
     configData.headers = {
-      "Authorization": store.state.user.token_type + ' ' + store.state.user.access_token
+      "Authorization": store.getters.token_type + ' ' + store.getters.access_token
     }
   }
   configData.withCredentials = false;
@@ -38,9 +37,12 @@ creatAxios.interceptors.request.use(configData => { // 请求拦截 在发送请
 })
 
 creatAxios.interceptors.response.use(response => { // 响应拦截 对响应数据做点什么
+  if (/\/oauth\/token/g.test(response.config.url)) {
+    return response
+  }
   if(response.data.code !== 200) {
     Message.error(response.data.stateMsg);
-    return response;
+    return Promise.reject(response);
   }
   return response
 }, error => { // 响应失败做的事

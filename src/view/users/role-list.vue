@@ -24,11 +24,13 @@
           <el-table-column prop="description" label="描述"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-          <el-table-column label="操作" width="300">
+          <el-table-column label="操作" width="300" align="center">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
+              <el-button type="primary" icon="el-icon-edit" circle @click="showModal(scope.row)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row)"></el-button>
+              <!-- <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button> -->
               <el-button type="success" @click="showPower(scope.row)">分配权限</el-button>
-              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button>
+              <!-- <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button> -->
             </template>
           </el-table-column>
         </el-table>
@@ -125,21 +127,17 @@ export default {
     },
     getList() {
       http.getRoles(this.keywords).then(res => {
-        if (res.data.code) {
-          this.list = res.data.data.data;
-          this.total = res.data.data.total;
-        }
+        this.list = res.data.data.data;
+        this.total = res.data.data.total;
       });
     },
     addRole(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           http.addRole(this.role).then(res => {
-            if (res.data.code === 200) {
-              this.isShow = false;
-              this.getList();
-              this.$message.success(res.data.stateMsg);
-            }
+            this.isShow = false;
+            this.getList();
+            this.$message.success(res.data.stateMsg);
           });
         }
       });
@@ -195,16 +193,12 @@ export default {
         permission_id: permIds,
         id: this.role.id
       };
-      http
-        .updateRolePower(params)
-        .then(res => {
-          if (res.data.code === 200) {
-            this.isShowPower = false;
-            this.keywords.page = 1;
-            that.getList();
-            this.$message.success(res.data.stateMsg);
-          }
-        })
+      http.updateRolePower(params).then(res => {
+        this.isShowPower = false;
+        this.keywords.page = 1;
+        that.getList();
+        this.$message.success(res.data.stateMsg);
+      });
     },
     showDel(item) {
       this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
@@ -220,14 +214,10 @@ export default {
         });
     },
     deleteRole(item) {
-      http
-        .deleteRole({ id: item.id })
-        .then(res => {
-          if (res.data.code === 200) {
-            this.$message.success(res.data.stateMsg);
-            this.getList();
-          }
-        })
+      http.deleteRole({ id: item.id }).then(res => {
+        this.$message.success(res.data.stateMsg);
+        this.getList();
+      });
     }
   }
 };

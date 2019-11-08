@@ -65,7 +65,6 @@ export default {
     http
       .getJurisdiction({})
       .then(res => {
-        console.log('res', res);
         this.items = res.data.data;
       })
     // 通过 Event Bus 进行组件间通信，来折叠侧边栏

@@ -34,10 +34,10 @@
           <!-- <el-table-column prop="description" label="描述" width="180"></el-table-column> -->
           <el-table-column prop="created_at" label="创建时间" width="150"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间" width="150"></el-table-column>
-          <el-table-column label="操作" width="180">
+          <el-table-column label="操作" width="180" align="center">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
-              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button>
+              <el-button type="primary" icon="el-icon-edit" circle @click="showModal(scope.row)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -109,17 +109,9 @@ export default {
   methods: {
     roofPlacement(item) {
       item.isTop = true;
-      http
-        .addNode(item)
-        .then(res => {
-          if (res.data.original && res.data.original.updated) {
-            // that.isShow = false;
-            // this.$message.success("修改成功！");
-          } else {
-            this.$message.error("置顶失败！");
-          }
-        })
-        .catch(res => {});
+      http.addNode(item).then(res => {
+        console.log("res", res);
+      });
     },
     getList() {
       http.getNodesGetTree({}).then(res => {
@@ -135,11 +127,9 @@ export default {
             return false;
           }
           http.addNode(that.nodes).then(res => {
-            if (res.data.code === 200) {
-              this.isShow = false;
-              this.getList();
-              this.$message.success(res.data.stateMsg);
-            }
+            this.isShow = false;
+            this.getList();
+            this.$message.success(res.data.stateMsg);
           });
         }
       });
@@ -154,11 +144,9 @@ export default {
       }
       this.isShow = true;
       const that = this;
-      http
-        .getNodesAll({})
-        .then(res => {
-          that.nodeAll = res.data.data;
-        })
+      http.getNodesAll({}).then(res => {
+        that.nodeAll = res.data.data;
+      });
     },
     showDel(item) {
       this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
@@ -178,14 +166,10 @@ export default {
         });
     },
     deleteNode(item) {
-      http
-        .deleteNode({ id: item.id })
-        .then(res => {
-          if (res.data.code === 200) {
-            this.$message.success(res.data.stateMsg);
-            this.getList();
-          }
-        })
+      http.deleteNode({ id: item.id }).then(res => {
+        this.$message.success(res.data.stateMsg);
+        this.getList();
+      });
     }
   }
 };

@@ -10,7 +10,7 @@
             <el-button type="primary" @click="search()">查询</el-button>
           </el-form-item>
         </el-form>
-      </div> -->
+      </div>-->
       <el-row>
         <el-col :span="24">
           <div class="grid-content bg-purple-dark">
@@ -24,10 +24,10 @@
           <el-table-column prop="create_user" label="创建人"></el-table-column>
           <el-table-column prop="created_at" label="创建时间"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-          <el-table-column label="操作" width="300">
+          <el-table-column label="操作" width="120" align="center">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row)">编辑</el-button>
-              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row)">删除</el-button>
+              <el-button type="primary" icon="el-icon-edit" circle @click="showModal(scope.row)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -40,7 +40,7 @@
           :page-size="8"
           @current-change="changeCurrent"
         ></el-pagination>
-      </div> -->
+      </div>-->
     </el-card>
 
     <el-dialog :title="column.id ? '修改' : '新增'" :visible.sync="isShow" width="500px">
@@ -87,34 +87,21 @@ export default {
       this.getList();
     },
     getList() {
-      const that = this;
       http
-        .getColumnList(that.keywords)
+        .getColumnList(this.keywords)
         .then(res => {
-          that.columnlist = res.data.data;
-          that.total = res.data.total;
+          this.columnlist = res.data.data.data;
+          this.total = res.data.data.total;
         })
-        .catch(res => {});
     },
     addColumn(formName) {
-      const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          http
-            .addColumn(that.column)
-            .then(res => {
-              if (res.data.original && res.data.original.created) {
-                that.isShow = false;
-                that.getList();
-                this.$message.success("新增成功！");
-              } else if (res.data.original && res.data.original.updated) {
-                that.isShow = false;
-                this.$message.success("修改成功！");
-              }else {
-                this.$message.error(res.data.original.message);
-              }
-            })
-            .catch(res => {});
+          http.addColumn(this.column).then(res => {
+            this.$message.success(res.data.stateMsg);
+            this.getList();
+            this.isShow = false;
+          });
         }
       });
     },
@@ -136,19 +123,10 @@ export default {
         });
     },
     delColumn(item) {
-      http
-        .delColumn({ id: item.id })
-        .then(res => {
-          if (res.data.result) {
-            this.$message.success(res.data.message);
-            this.getList();
-          } else {
-            this.$message.error(res.data.message);
-          }
-        })
-        .catch(res => {
-          this.$message.error("删除失败!");
-        });
+      http.delColumn({ id: item.id }).then(res => {
+        this.$message.success(res.data.stateMsg);
+        this.getList();
+      });
     }
   }
 };

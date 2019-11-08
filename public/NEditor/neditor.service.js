@@ -14,6 +14,8 @@ UE.Editor.prototype.getActionUrl = function (action) {
     // } else {
     //     return this._bkGetActionUrl.call(this, action);
     // }
+    let urlArr = this._bkGetActionUrl.call(this, action).split('/');
+    window.url = [urlArr[0], urlArr[1], urlArr[2]].join('/');
     if (action == 'uploadimage' || action == 'uploadscrawl') {
         return this._bkGetActionUrl.call(this, action);
     }
@@ -63,12 +65,7 @@ window.UEDITOR_CONFIG['imageUploadService'] = function (context, editor) {
          */
         getResponseSuccess: function (res) {
             var host = window.location.host;
-            if (res.data) {
-                res.url = 'https://city.newcoc.cn/image/' + res.data;
-                if (/ct.newcoc.cn/g.test(host)) {
-                    res.url = 'https://ctapi.newcoc.cn/image/' + res.data;
-                }
-            }
+            res.url = window.url + res.data;
             return (res.stateCode == 200 || res.code == 200);
         },
         /* 指定上传接口返回的response中图片路径的字段，默认为 url

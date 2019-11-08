@@ -12,7 +12,7 @@ export default {
     TreeChart
   },
   created() {
-    this.id = this.$route.query.id;
+    this.id = this.$route.params.id;
     this.getTreeChart();
   },
   data() {
@@ -56,11 +56,8 @@ export default {
 	methods: {
     getTreeChart() {
       http.getTreeChart({surname_id: this.id}).then(res => {
-        console.log('success=>', res.data[0]);
-        this.pedigreeCharts = res.data[0];
-      }).catch(res => {
-
-      });
+        this.pedigreeCharts = res.data.data[0];
+      })
     },
 		clickNode: function(node){
       // eslint-disable-next-line

@@ -20,13 +20,9 @@ export default {
     };
   },
   created() {
-    http
-      .getGenealogy({ id: this.$route.query.id })
-      .then(res => {
-        if (res.data.code == 200) {
-          this.genealogy = res.data.data;
-        }
-      })
+    http.getGenealogy({ id: this.$route.params.id }).then(res => {
+      this.genealogy = res.data.data;
+    });
   }
 };
 </script>

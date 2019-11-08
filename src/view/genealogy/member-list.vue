@@ -47,13 +47,16 @@
               <span>{{ scope.row.province + scope.row.city + scope.row.area + scope.row.address }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="created_at" label="创建时间" width="150"></el-table-column>
-          <el-table-column prop="updated_at" label="更新时间" width="150"></el-table-column>
+          <el-table-column prop="created_at" label="创建时间" width="180"></el-table-column>
+          <el-table-column prop="updated_at" label="更新时间" width="180"></el-table-column>
           <el-table-column label="操作" width="270">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row.id)">编辑</el-button>
-              <el-button type="info" @click="seeDetail(scope.row.id)">简介</el-button>
-              <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
+              <el-button type="primary" icon="el-icon-edit" circle @click="showModal(scope.row.id)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row.id)"></el-button>
+              <el-button type="info" icon="el-icon-info" circle @click="seeDetail(scope.row.id)"></el-button>
+              <!-- <el-button type="primary" icon="el-icon-edit" @click="showModal(scope.row.id)">编辑</el-button> -->
+              <!-- <el-button type="info" @click="seeDetail(scope.row.id)">简介</el-button> -->
+              <!-- <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button> -->
             </template>
           </el-table-column>
         </el-table>
@@ -100,13 +103,10 @@ export default {
     },
     getList() {
       const that = this;
-      http
-        .getMemberList(this.keywords)
-        .then(res => {
-          that.memberlist = res.data.data;
-          that.total = res.data.total;
-        })
-        .catch(res => {});
+      http.getMemberList(this.keywords).then(res => {
+        that.memberlist = res.data.data.data;
+        that.total = res.data.data.total;
+      });
     },
     changeCurrent(page) {
       this.keywords.page = page;
@@ -131,30 +131,14 @@ export default {
     },
     deletemember(id) {
       const that = this;
-      http
-        .deleteMember({ id: id })
-        .then(res => {
-          if (res.data.result) {
-            if (res.data.code == 200) {
-              this.$message.success("删除成功！");
-              that.getList();
-            }
-          } else {
-            this.$message.error(res.data.message);
-          }
-        })
-        .catch(res => {
-          this.$message.error("删除失败!");
-        });
+      http.deleteMember({ id: id }).then(res => {
+        this.$message.success("删除成功！");
+        that.getList();
+      });
     },
     showModal(id) {
       if (id) {
-        this.$router.push({
-          path: "/member-edit",
-          query: {
-            id: id
-          }
-        });
+        this.$router.push(`/member-edit/${id}`);
       } else {
         this.$router.push("/member-add");
       }

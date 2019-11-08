@@ -13,6 +13,7 @@
         <el-upload
           class="avatar-uploader"
           name="img"
+          :headers="headers"
           :action="upImgageUrl"
           :show-file-list="false"
           :on-success="handleThumbnailSuccess"
@@ -31,66 +32,58 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="简介" prop="content">
-        <vue-ueditor-wrap
+        <vue-neditor-wrap
           v-model="article.content"
-          :destroy="destroy"
-          :config="config"
+          :config="myConfig"
+          :destroy="false"
           @ready="ready"
-          style="width: 800px"
-        ></vue-ueditor-wrap>
+        ></vue-neditor-wrap>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('articleForm')">{{ id == '' ? '立即创建' : '保存'}}</el-button>
+        <el-button type="primary" @click="onSubmit('articleForm')">立即创建</el-button>
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
   </el-card>
 </template>
 <script>
-import VueUeditorWrap from "vue-ueditor-wrap";
 import config from "@/config/index";
 import http from "@/http/server/api";
+import editor from "@/config/editor";
 export default {
-  components: {
-    VueUeditorWrap
-  },
   data() {
     return {
       id: "",
-      article: {},
+      article: {
+        content: ''
+      },
       isShowImg: true,
       columnlist: [],
       baseUrl: config.baseUrl,
       upImgageUrl: config.baseUrl + "/api/upImage",
-      destroy: false,
-      config: {
-        autoHeightEnabled: false,
-        initialFrameHeight: 500,
-        initialFrameWidth: "100%",
-        serverUrl: config.ueBaseUrl + "/static/UEditor/php/controller.php",
-        toolbars: config.toolbars
-      },
+      myConfig: editor.myConfig,
       rules: {
         title: [{ required: true, message: "标题必填！", trigger: "blur" }],
         content: [
           { required: true, message: "文章内容不能为空！", trigger: "blur" }
         ],
         type: [{ required: true, message: "所属栏目必选！", trigger: "blur" }]
-      }
+      },
+       headers: {
+        "Authorization": this.$store.getters.token_type + ' ' + this.$store.getters.access_token
+      },
     };
   },
   created() {
-		const that = this; 
     http
-      .getColumnList(that.keywords)
+      .getColumnList({})
       .then(res => {
-        that.columnlist = res.data.data;
+        this.columnlist = res.data.data.data;
       })
-      .catch(res => {});
   },
   methods: {
-    ready(editorInstance) {
-      console.log(`实例${editorInstance.key}已经初始化:`, editorInstance);
+     ready(editorSetting) {
+      // console.log("editorSetting", editorSetting);
     },
     addCustomUI(editorId, editorConfig) {
       console.log(
@@ -115,28 +108,17 @@ export default {
         }
 
         if (valid) {
-          http
-            .addarticle(that.article)
-            .then(res => {
-              if (res.data.original && res.data.original.created) {
-                this.$message.success("新增成功！");
-                this.$router.push("/article-list");
-              } else if (res.data.original && res.data.original.updated) {
-                this.$message.success("修改成功！");
-                this.$router.push("/article-list");
-              } else {
-                this.$message.error("添加失败！");
-              }
-            })
-            .catch(res => {});
+          http.addarticle(that.article).then(res => {
+            this.$message.success(res.data.stateMsg);
+            this.$router.go(-1);
+          });
         }
       });
     },
     handleThumbnailSuccess(res, file) {
-      if (res.res) {
-        this.article.thumbnail = res.url;
+      if (res.code*10/10 === 200) {
+        this.article.thumbnail = res.data;
         this.isShowImg = false;
-        // console.log(URL.createObjectURL(file.raw));
       } else {
         this.$message.error("上传失败！");
       }

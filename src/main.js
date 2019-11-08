@@ -10,12 +10,15 @@ import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import "babel-polyfill";
-// import VueUeditorWrap from 'vue-ueditor-wrap'
-// Vue.component('vue-ueditor-wrap', VueUeditorWrap)
+
+import VueNeditorWrap from "vue-neditor-wrap";
+Vue.use(VueNeditorWrap);
+
+Vue.component('vue-neditor-wrap', VueNeditorWrap)
 Vue.config.productionTip = false
 Vue.use(VueI18n);
 Vue.use(ElementUI, {
-    size: 'small'
+    size: 'medium'
 });
 Vue.prototype.$axios = axios;
 
@@ -31,26 +34,13 @@ const i18n = new VueI18n({
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
-    if ((!VueCookies.isKey('access_token') || !VueCookies.isKey('username')) && to.path !== '/login') {
+    if (!VueCookies.isKey('access_token') && to.path !== '/login') {
         next('/login');
     }else {
         next();
     }
     
 });
-
-// axios.interceptors.response.use(response => { 
-//     return response
-// }, error => {
-//     VueCookies.remove("access_token");
-//     VueCookies.remove("token_type");
-//     VueCookies.remove("headUrl");
-//     VueCookies.remove("username");
-//     router.push("/login");
-//     // return Promise.reject(error);
-// })
-
-
 
 new Vue({
     router,

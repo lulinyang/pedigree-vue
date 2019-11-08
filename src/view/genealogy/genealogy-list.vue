@@ -36,16 +36,20 @@
         <el-table-column prop="username" label="创建人"></el-table-column>
         <el-table-column prop="created_at" label="创建时间"></el-table-column>
         <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-        <el-table-column label="查看" width="200">
+        <!-- <el-table-column label="查看" width="200">
           <template slot-scope="scope">
             <el-button type="info" @click="seeDetail(scope.row.id)">简介</el-button>
             <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
           </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200">
+        </el-table-column> -->
+        <el-table-column label="操作" width="300" align="center">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" @click="jumpPage('edit', scope.row.id)">编辑</el-button>
-            <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button>
+              <el-button type="primary" icon="el-icon-edit" circle @click="jumpPage('edit', scope.row.id)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row.id)"></el-button>
+              <el-button type="info" icon="el-icon-info" circle @click="seeDetail(scope.row.id)"></el-button>
+              <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
+            <!-- <el-button type="primary" icon="el-icon-edit" @click="jumpPage('edit', scope.row.id)">编辑</el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button> -->
           </template>
         </el-table-column>
       </el-table>
@@ -86,12 +90,7 @@ export default {
   },
   methods: {
     seePedigree(id) {
-      this.$router.push({
-        path: "/pedigree-list",
-        query: {
-          id: id
-        }
-      });
+      this.$router.push(`/pedigree-list/${id}`);
     },
     search() {
       this.getList();
@@ -100,7 +99,7 @@ export default {
       const that = this;
       http.getGenealogyList(this.keywords).then(res => {
         that.list = res.data.data.data;
-        that.total = res.data.total.data;
+        that.total = res.data.data.total;
       });
     },
     changeCurrent(page) {
@@ -115,21 +114,11 @@ export default {
       if (page === "add") {
         this.$router.push("/genealogy-add");
       } else {
-        this.$router.push({
-          path: "/genealogy-edit",
-          query: {
-            id: id
-          }
-        });
+        this.$router.push(`/genealogy-edit/${id}`);
       }
     },
     seeDetail(id) {
-      this.$router.push({
-        path: "/genealogy-detail",
-        query: {
-          id: id
-        }
-      });
+      this.$router.push(`/genealogy-detail/${id}`);
     },
     showDel(id) {
       const that = this;
@@ -142,12 +131,9 @@ export default {
           http
             .deleteGenealogy({ id: id })
             .then(res => {
-              if (res.data.code == 200) {
-                this.$message.success("删除成功！");
-                that.getList();
-              }
+              this.$message.success("删除成功！");
+              that.getList();
             })
-            .catch(res => {});
         })
         .catch(() => {
           this.$message.info("已取消删除!");

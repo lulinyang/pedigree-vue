@@ -13,6 +13,7 @@
         <el-upload
           class="avatar-uploader"
           name="img"
+          :headers="headers"
           :action="upImgageUrl"
           :show-file-list="false"
           :on-success="handleThumbnailSuccess"
@@ -31,13 +32,12 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="简介" prop="content">
-        <vue-ueditor-wrap
+        <vue-neditor-wrap
           v-model="article.content"
-          :destroy="destroy"
-          :config="config"
+          :config="myConfig"
+          :destroy="false"
           @ready="ready"
-          style="width: 800px"
-        ></vue-ueditor-wrap>
+        ></vue-neditor-wrap>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit('articleForm')">{{ id == '' ? '立即创建' : '保存'}}</el-button>
@@ -47,13 +47,10 @@
   </el-card>
 </template>
 <script>
-import VueUeditorWrap from "vue-ueditor-wrap";
 import config from "@/config/index";
 import http from "@/http/server/api";
+import editor from "@/config/editor";
 export default {
-  components: {
-    VueUeditorWrap
-  },
   data() {
     return {
       id: "",
@@ -62,13 +59,9 @@ export default {
       columnlist: [],
       baseUrl: config.baseUrl,
       upImgageUrl: config.baseUrl + "/api/upImage",
-      destroy: false,
-      config: {
-        autoHeightEnabled: false,
-        initialFrameHeight: 500,
-        initialFrameWidth: "100%",
-        serverUrl: config.ueBaseUrl + "/static/UEditor/php/controller.php",
-        toolbars: config.toolbars
+      myConfig: editor.myConfig,
+      headers: {
+        "Authorization": this.$store.getters.token_type + ' ' + this.$store.getters.access_token
       },
       rules: {
         title: [{ required: true, message: "标题必填！", trigger: "blur" }],
@@ -80,37 +73,33 @@ export default {
     };
   },
   created() {
-		const that = this;
-    this.id = this.$route.query.id;
+    const that = this;
+    this.id = this.$route.params.id;
     if (this.id != "") {
       const that = this;
       http
         .getArticle({ id: this.id })
         .then(res => {
           if (res.data.code == 200) {
-            if (res.data.result.thumbnail) {
+            if (res.data.data.thumbnail) {
               this.isShowImg = false;
             }
-            res.data.result.content =
-              res.data.result.content == null
-                ? " "
-                : res.data.result.content;
-            that.article = res.data.result;
+            res.data.data.content =
+              res.data.data.content == null ? " " : res.data.data.content;
+            that.article = res.data.data;
           }
         })
-        .catch(res => {});
     }
-   
+
     http
-      .getColumnList(that.keywords)
+      .getColumnList({})
       .then(res => {
-        that.columnlist = res.data.data;
+        that.columnlist = res.data.data.data;
       })
-      .catch(res => {});
   },
   methods: {
-    ready(editorInstance) {
-      console.log(`实例${editorInstance.key}已经初始化:`, editorInstance);
+     ready(editorSetting) {
+      // console.log("editorSetting", editorSetting);
     },
     addCustomUI(editorId, editorConfig) {
       console.log(
@@ -138,23 +127,15 @@ export default {
           http
             .addarticle(that.article)
             .then(res => {
-              if (res.data.original && res.data.original.created) {
-                this.$message.success("新增成功！");
-                this.$router.push("/article-list");
-              } else if (res.data.original && res.data.original.updated) {
-                this.$message.success("修改成功！");
-                this.$router.push("/article-list");
-              } else {
-                this.$message.error("添加失败！");
-              }
+              this.$message.success(res.data.stateMsg);
+              this.$router.go(-1);
             })
-            .catch(res => {});
         }
       });
     },
     handleThumbnailSuccess(res, file) {
-      if (res.res) {
-        this.article.thumbnail = res.url;
+       if (res.code*10/10 === 200) {
+        this.article.thumbnail = res.data;
         this.isShowImg = false;
         // console.log(URL.createObjectURL(file.raw));
       } else {

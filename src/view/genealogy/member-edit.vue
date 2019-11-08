@@ -6,6 +6,7 @@
           class="avatar-uploader"
           :action="upImgageUrl"
           :show-file-list="false"
+          :headers="headers"
           name="img"
           :on-success="handleAvatarSuccess"
         >
@@ -39,13 +40,19 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="简介">
-        <vue-ueditor-wrap
+        <vue-neditor-wrap
+          v-model="member.brief_introduction"
+          :config="myConfig"
+          :destroy="false"
+          @ready="ready"
+        ></vue-neditor-wrap>
+        <!-- <vue-ueditor-wrap
           v-model="member.brief_introduction"
           :destroy="destroy"
           :config="config"
           @ready="ready"
           style="width: 800px"
-        ></vue-ueditor-wrap>
+        ></vue-ueditor-wrap> -->
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit('memberForm')">{{ id == '' ? '立即创建' : '保存'}}</el-button>
@@ -55,16 +62,12 @@
   </el-card>
 </template>
 <script>
-import VueUeditorWrap from "vue-ueditor-wrap";
+import editor from "@/config/editor";
 import config from "@/config/index";
 import http from "@/http/server/api";
 import { area } from "@/tools/area";
 import { request } from "http";
 export default {
-  components: {
-    VueUeditorWrap
-  },
-
   data() {
     return {
       id: "",
@@ -73,43 +76,35 @@ export default {
       options: area,
       baseUrl: config.baseUrl,
       upImgageUrl: config.baseUrl + "/api/upImage",
+      myConfig: editor.myConfig,
       destroy: false,
-      config: {
-        autoHeightEnabled: false,
-        initialFrameHeight: 500,
-        initialFrameWidth: "100%",
-        serverUrl: config.ueBaseUrl + "/static/UEditor/php/controller.php",
-        toolbars: config.toolbars
-      },
       rules: {
         name: [{ required: true, message: "姓名不能为空", trigger: "blur" }]
-      }
+      },
+       headers: {
+        "Authorization": this.$store.getters.token_type + ' ' + this.$store.getters.access_token
+      },
     };
   },
   created() {
-    this.id = this.$route.query.id;
+    this.id = this.$route.params.id;
     if (this.id && this.id != "") {
       const that = this;
-      http
-        .getMember({ id: this.id })
-        .then(res => {
-          if (res.data.code == "200") {
-            if (res.data.result.thumbnail) {
-              that.isShowImg = false;
-            }
-            res.data.result.brief_introduction =
-              res.data.result.brief_introduction == null
-                ? " "
-                : res.data.result.brief_introduction;
-            that.member = res.data.result;
-          }
-        })
-        .catch(res => {});
+      http.getMember({ id: this.id }).then(res => {
+        if (res.data.data.thumbnail) {
+          that.isShowImg = false;
+        }
+        res.data.data.brief_introduction =
+          res.data.data.brief_introduction == null
+            ? " "
+            : res.data.data.brief_introduction;
+        that.member = res.data.data;
+      });
     }
   },
   methods: {
-    ready(editorInstance) {
-      console.log(`实例${editorInstance.key}已经初始化:`, editorInstance);
+    ready(editorSetting) {
+      // console.log("editorSetting", editorSetting);
     },
     addCustomUI(editorId, editorConfig) {
       console.log(
@@ -121,28 +116,18 @@ export default {
       const that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          http
-            .addMember(that.member)
-            .then(res => {
-              if (res.data.original && res.data.original.created) {
-                this.$message.success("新增成功！");
-                this.$router.push("/member-list");
-              } else if (res.data.original && res.data.original.updated) {
-                this.$message.success("修改成功！");
-                this.$router.push("/member-list");
-              } else {
-                this.$message.error("添加失败！");
-              }
-            })
-            .catch(res => {});
+          http.addMember(that.member).then(res => {
+            this.$message.success(res.data.stateMsg);
+            this.$router.go(-1);
+          });
         } else {
           this.$message.error("区域姓氏必填！");
         }
       });
     },
     handleAvatarSuccess(res, file) {
-      if (res.res) {
-        this.member.headUrl = res.url;
+      if (res.code *10/10 === 200) {
+        this.member.headUrl = res.data;
         this.isShowImg = false;
       } else {
         this.$message.error("上传失败！");

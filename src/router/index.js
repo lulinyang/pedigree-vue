@@ -4,7 +4,7 @@ import Router from 'vue-router';
 Vue.use(Router);
 
 export default new Router({
-    // mode: 'history',
+    mode: 'history',
     routes: [
         {
             path: '/',
@@ -46,22 +46,22 @@ export default new Router({
                     meta: { title: '新增族谱' }
                 },
                 {
-                    path: '/genealogy-edit',
+                    path: '/genealogy-edit/:id(\\d+)',
                     component: resolve => require(['@/view/genealogy/genealogy-edit.vue'], resolve),
                     meta: { title: '编辑族谱' }
                 },
                 {
-                    path: '/genealogy-detail',
+                    path: '/genealogy-detail/:id(\\d+)',
                     component: resolve => require(['@/view/genealogy/genealogy-detail.vue'], resolve),
                     meta: { title: '家族简介' }
                 },
                 {
-                    path: '/pedigree-list',
+                    path: '/pedigree-list/:id(\\d+)',
                     component: resolve => require(['@/view/genealogy/pedigree-list.vue'], resolve),
                     meta: { title: '族谱详情' }
                 },
                 {
-                    path: '/pedigree-topology',
+                    path: '/pedigree-topology/:id(\\d+)',
                     component: resolve => require(['@/view/genealogy/pedigree-topology.vue'], resolve),
                     meta: { title: '族谱拓扑图' }
                 },
@@ -76,7 +76,7 @@ export default new Router({
                     meta: { title: '新增成员' }
                 },
                 {
-                    path: '/member-edit',
+                    path: '/member-edit/:id(\\d+)',
                     component: resolve => require(['@/view/genealogy/member-edit.vue'], resolve),
                     meta: { title: '编辑成员' }
                 },
@@ -101,12 +101,12 @@ export default new Router({
                     meta: { title: '新增文章' }
                 },
                 {
-                    path: '/article-edit',
+                    path: '/article-edit/:id(\\d+)',
                     component: resolve => require(['@/view/article/article-edit.vue'], resolve),
                     meta: { title: '编辑文章' }
                 },
                 {
-                    path: '/article-detail',
+                    path: '/article-detail/:id(\\d+)',
                     component: resolve => require(['@/view/article/article-detail.vue'], resolve),
                     meta: { title: '文章详情' }
                 },

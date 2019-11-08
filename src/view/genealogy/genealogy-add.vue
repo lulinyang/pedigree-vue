@@ -13,22 +13,14 @@
           :on-success="handleAvatarSuccess"
           :limit="1"
           :on-exceed="errMessage"
+          :headers="headers"
+          name="img"
         >
           <i class="el-icon-plus"></i>
         </el-upload>
         <el-dialog :visible.sync="dialogVisible">
           <img width="100%" :src="dialogImageUrl" alt />
         </el-dialog>
-        <!-- <el-upload
-          class="avatar-uploader"
-          name="img"
-          :action="upImgageUrl"
-          :show-file-list="false"
-          :on-success="handleThumbnailSuccess"
-        >
-          <img v-if="genealogy.thumbnail" :src="baseUrl + genealogy.thumbnail" class="avatar" />
-          <i v-if="isShowImg" class="el-icon-plus avatar-uploader-icon"></i>
-        </el-upload>-->
       </el-form-item>
       <el-form-item label="描述" style="width: 700px;">
         <el-input type="textarea" v-model="genealogy.describe" :rows="4" placeholder="请输入描述内容"></el-input>
@@ -49,15 +41,10 @@
   </el-card>
 </template>
 <script>
-import VueNeditorWrap from "vue-neditor-wrap";
 import editor from "@/config/editor";
 import config from "@/config/index";
 import http from "@/http/server/api";
 export default {
-  components: {
-    VueNeditorWrap
-  },
-
   data() {
     return {
       genealogy: {
@@ -70,8 +57,11 @@ export default {
       rules: {
         area_surname: [{ required: true, message: "区域姓氏", trigger: "blur" }]
       },
+      headers: {
+        "Authorization": this.$store.getters.token_type + ' ' + this.$store.getters.access_token
+      },
       dialogImageUrl: "",
-      dialogVisible: false,
+      dialogVisible: false
     };
   },
   created() {},
@@ -83,19 +73,11 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           http.addGenealogy(this.genealogy).then(res => {
-            if (res.data.code === 200) {
-              this.$message.success(res.data.stateMsg);
-              this.$router.push('/genealogy-list');
-            }
+            this.$router.go(-1);
+            this.$message.success(res.data.stateMsg);
           });
         }
       });
-    },
-    handleThumbnailSuccess(res, file) {
-      if (res.data.code === 200) {
-        this.genealogy.thumbnail = res.data.data.url;
-        this.isShowImg = false;
-      }
     },
     handleRemove(file, fileList) {
       delete this.genealogy.thumbnail;
@@ -105,13 +87,14 @@ export default {
       this.dialogVisible = true;
     },
     handleAvatarSuccess(res, file) {
-      if ((res.code / 10) * 10 === 0) {
-        this.genealogy.thumbnail = res.data.src;
+      console.log(res,  res.data);
+      if (res.code *10/10 === 200) {
+        this.genealogy.thumbnail = res.data;
       }
     },
     errMessage(files, fileList) {
       this.$message.warning("只能上传一张图片！");
-    },
+    }
   }
 };
 </script>

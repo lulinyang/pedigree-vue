@@ -20,16 +20,12 @@ export default {
   created() {
     const that = this;
     this.id = this.$route.query.id;
-    console.log("this.id", this.id);
     if (this.id != "") {
       http
         .getMember({ id: this.id })
         .then(res => {
-          if (res.data.code == "200") {
-            that.member = res.data.result;
-          }
+          that.member = res.data.data;
         })
-        .catch(res => {});
     }
   }
 };
