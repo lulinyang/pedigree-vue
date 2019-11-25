@@ -65,6 +65,7 @@ window.UEDITOR_CONFIG['imageUploadService'] = function (context, editor) {
          */
         getResponseSuccess: function (res) {
             var host = window.location.host;
+            console.log('res', res);
             res.url = window.url + res.data;
             return (res.stateCode == 200 || res.code == 200);
         },

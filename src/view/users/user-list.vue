@@ -23,11 +23,11 @@
       </el-row>
       <div>
         <el-table :data="list" style="width: 100%">
-          <el-table-column prop="username" label="姓名" width="150"></el-table-column>
+          <el-table-column prop="username" label="用户名" width="150"></el-table-column>
           <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
-          <el-table-column prop="orgname" label="机构名" width="180"></el-table-column>
+          <el-table-column prop="orgname" label="昵称/企业" width="180"></el-table-column>
           <el-table-column prop="rolen_ame" label="角色"></el-table-column>
-          <el-table-column prop="login_at" label="上次登录时间" width="180"></el-table-column>
+          <!-- <el-table-column prop="login_at" label="上次登录时间" width="180"></el-table-column> -->
           <el-table-column prop="created_at" label="创建时间" width="180"></el-table-column>
           <el-table-column prop="updated_at" label="更新时间" width="180"></el-table-column>
           <el-table-column label="操作" width="120" align="center">
@@ -63,7 +63,7 @@
         <el-form-item label="用户名" prop="username" style="width: 350px;">
           <el-input v-model="user.username" :disabled="Boolean(user.id)"></el-input>
         </el-form-item>
-        <el-form-item label="机构名" style="width: 350px;">
+        <el-form-item label="昵称/企业" prop="orgname" style="width: 350px;">
           <el-input v-model="user.orgname"></el-input>
         </el-form-item>
         <el-form-item label="邮箱" prop="email" style="width: 350px;">
@@ -111,7 +111,10 @@ export default {
         ],
         email: [{ required: true, message: "请输入邮箱", trigger: "blur" }],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-        role_id: [{ required: true, message: "请选择角色", trigger: "blur" }]
+        role_id: [{ required: true, message: "请选择角色", trigger: "blur" }],
+        orgname: [
+          { required: true, message: "昵称或企业必填", trigger: "blur" }
+        ]
       },
       roles: [],
       total: 0

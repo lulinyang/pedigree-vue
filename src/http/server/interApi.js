@@ -5,6 +5,7 @@ import config from '@/config/index'
 import VueCookies from 'vue-cookies'
 import { Loading, Message } from 'element-ui'
 import router from '../../router/index';
+import qs from 'qs'
 
 let loading;
 function startLoading() {    //使用Element loading-start 方法
@@ -19,9 +20,10 @@ function endLoading() {    //使用Element loading-close 方法
 // 配置 axios，并生成实例
 const creatAxios = axios.create({
   baseURL: config.baseUrl,
-  withCredentials: true
+  withCredentials: true,
 })
-
+// creatAxios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
 // 拦截器配置
 creatAxios.interceptors.request.use(configData => { // 请求拦截 在发送请求之前做些什么
   if (!/\/oauth\/token/g.test(configData.url)) {

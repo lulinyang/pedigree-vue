@@ -50,6 +50,7 @@
 import config from "@/config/index";
 import http from "@/http/server/api";
 import editor from "@/config/editor";
+import { limitWords } from "@/tools/validator";
 export default {
   data() {
     return {
@@ -63,11 +64,11 @@ export default {
       upImgageUrl: config.baseUrl + "/api/upImage",
       myConfig: editor.myConfig,
       rules: {
-        title: [{ required: true, message: "标题必填！", trigger: "blur" }],
+        title: [{ required: true, trigger: ["blur", "change"], validator: limitWords }],
         content: [
-          { required: true, message: "文章内容不能为空！", trigger: "blur" }
+          { required: true, message: "文章内容不能为空！", trigger: ["blur", "change"] }
         ],
-        type: [{ required: true, message: "所属栏目必选！", trigger: "blur" }]
+        type: [{ required: true, message: "所属栏目必选！", trigger: ["blur", "change"] }]
       },
        headers: {
         "Authorization": this.$store.getters.token_type + ' ' + this.$store.getters.access_token

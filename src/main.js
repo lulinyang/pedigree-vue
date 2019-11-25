@@ -26,7 +26,7 @@ import store from '@/store/index'
 import VueCookies from 'vue-cookies'
 Vue.use(VueCookies)
 
-
+// Vue.http.options.emulateJSON = true;
 const i18n = new VueI18n({
     locale: 'zh',
     messages

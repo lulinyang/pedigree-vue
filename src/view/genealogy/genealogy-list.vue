@@ -32,24 +32,26 @@
             <el-image :src="baseUrl + scope.row.thumbnail"></el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="describe" label="描述" width="180"></el-table-column>
+        <el-table-column label="描述" width="180">
+          <template slot-scope="scope">
+            <p class="describe">{{scope.row.describe}}</p>
+          </template>
+        </el-table-column>
         <el-table-column prop="username" label="创建人"></el-table-column>
         <el-table-column prop="created_at" label="创建时间"></el-table-column>
         <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-        <!-- <el-table-column label="查看" width="200">
-          <template slot-scope="scope">
-            <el-button type="info" @click="seeDetail(scope.row.id)">简介</el-button>
-            <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
-          </template>
-        </el-table-column> -->
+
         <el-table-column label="操作" width="300" align="center">
           <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" circle @click="jumpPage('edit', scope.row.id)"></el-button>
-              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row.id)"></el-button>
-              <el-button type="info" icon="el-icon-info" circle @click="seeDetail(scope.row.id)"></el-button>
-              <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
-            <!-- <el-button type="primary" icon="el-icon-edit" @click="jumpPage('edit', scope.row.id)">编辑</el-button>
-            <el-button type="danger" icon="el-icon-delete" @click="showDel(scope.row.id)">删除</el-button> -->
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              circle
+              @click="jumpPage('edit', scope.row.id)"
+            ></el-button>
+            <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row.id)"></el-button>
+            <el-button type="info" icon="el-icon-info" circle @click="seeDetail(scope.row.id)"></el-button>
+            <el-button type="success" @click="seePedigree(scope.row.id)">查看族谱</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -128,12 +130,10 @@ export default {
         type: "warning"
       })
         .then(() => {
-          http
-            .deleteGenealogy({ id: id })
-            .then(res => {
-              this.$message.success("删除成功！");
-              that.getList();
-            })
+          http.deleteGenealogy({ id: id }).then(res => {
+            this.$message.success("删除成功！");
+            that.getList();
+          });
         })
         .catch(() => {
           this.$message.info("已取消删除!");
@@ -142,4 +142,13 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.describe {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /*截取第三行*/
+  overflow: hidden;
+}
+</style>
 

@@ -30,7 +30,7 @@
           <el-table-column label="操作" width="120" align="center">
             <template slot-scope="scope">
               <el-button type="primary" icon="el-icon-edit" circle @click="showModal(scope.row)"></el-button>
-              <el-button type="danger" icon="el-icon-delete" circle  @click="showDel(scope.row)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -134,20 +134,18 @@ export default {
       this.$router.push(`/pedigree-topology/${this.id}`);
     },
     selectMember(id) {
-      http
-        .getMember({ id, id })
-        .then(res => {
-          this.memberInfo = res.data.result;
-          if (
-            this.pedigree.mate_id != "" &&
-            this.memberInfo.sex == this.mateInfo.sex
-          ) {
-            this.$message.warning("不允许性别一样！");
-            this.$set(this.pedigree, "member_id", "");
-            return false;
-          }
-          this.$set(this.pedigree, "title", this.memberInfo.name);
-        })
+      http.getMember({ id, id }).then(res => {
+        this.memberInfo = res.data.data;
+        if (
+          this.pedigree.mate_id != "" &&
+          this.memberInfo.sex == this.mateInfo.sex
+        ) {
+          this.$message.warning("不允许性别一样！");
+          this.$set(this.pedigree, "member_id", "");
+          return false;
+        }
+        this.$set(this.pedigree, "title", this.memberInfo.name);
+      });
     },
     selectMate(id) {
       if (!this.pedigree.member_id) {
@@ -156,7 +154,7 @@ export default {
         return false;
       }
       http.getMember({ id, id }).then(res => {
-        this.mateInfo = res.data.result;
+        this.mateInfo = res.data.data;
         if (this.memberInfo.sex == this.mateInfo.sex) {
           this.$message.warning("不允许性别一样！");
           this.$set(this.pedigree, "mate_id", "");
@@ -193,21 +191,11 @@ export default {
           }
 
           that.pedigree.surname_id = that.id;
-          http
-            .addPedigree(that.pedigree)
-            .then(res => {
-              if (res.data.original && res.data.original.created) {
-                that.isShow = false;
-                that.getList();
-                this.$message.success("新增成功！");
-              } else if (res.data.original && res.data.original.updated) {
-                that.isShow = false;
-                this.$message.success("修改成功！");
-              } else {
-                this.$message.error("添加失败！");
-              }
-            })
-            .catch(res => {});
+          http.addPedigree(that.pedigree).then(res => {
+            this.$message.success(res.data.stateMsg);
+            that.isShow = false;
+            this.getList();
+          });
         }
       });
     },
@@ -224,15 +212,12 @@ export default {
       http
         .getMemberAll({})
         .then(res => {
-          this.memberAll = res.data;
+          this.memberAll = res.data.data;
         })
         .catch(res => {});
-      http
-        .getPedigreeAll({ surname_id: this.id })
-        .then(res => {
-          this.pedigreeAll = res.data;
-        })
-        .catch(res => {});
+      http.getPedigreeAll({ surname_id: this.id }).then(res => {
+        this.pedigreeAll = res.data.data;
+      });
     },
     showDel(item) {
       this.$confirm("此操作将永久删除该条数据, 是否继续?", "提示", {
@@ -246,27 +231,16 @@ export default {
             return false;
           }
           this.deletePedigree(item);
-          // this.$message.success("删除成功!");
         })
         .catch(() => {
           this.$message.info("已取消删除!");
         });
     },
     deletePedigree(item) {
-      http
-        .deletePedigree({ id: item.id, surname_id: this.id })
-        .then(res => {
-          console.log("success", res);
-          if (res.data.result) {
-            this.$message.success(res.data.message);
-            this.getList();
-          } else {
-            this.$message.error(res.data.message);
-          }
-        })
-        .catch(res => {
-          this.$message.error("删除失败!");
-        });
+      http.deletePedigree({ id: item.id, surname_id: this.id }).then(res => {
+        this.$message.success(res.data.stateMsg);
+        this.getList();
+      });
     }
   }
 };
