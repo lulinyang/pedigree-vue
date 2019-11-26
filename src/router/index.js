@@ -110,6 +110,17 @@ export default new Router({
 					component: resolve => require(['@/view/article/article-detail.vue'], resolve),
 					meta: { title: '文章详情' }
 				},
+				//基础设置
+				{
+					path: '/home-setting',
+					component: resolve => require(['@/view/setting/home-setting.vue'], resolve),
+					meta: { title: '首页配置' }
+				},
+				{
+					path: '/default-head',
+					component: resolve => require(['@/view/setting/default-head.vue'], resolve),
+					meta: { title: '默认头像' }
+				},
 				{
 					path: '/404',
 					component: resolve => require(['../components/page/404.vue'], resolve),

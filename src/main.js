@@ -20,7 +20,10 @@ Vue.use(VueI18n);
 Vue.use(ElementUI, {
     size: 'medium'
 });
+
+import config from "@/config/index"
 Vue.prototype.$axios = axios;
+Vue.prototype.$host = config.baseUrl;
 
 import store from '@/store/index'
 import VueCookies from 'vue-cookies'
