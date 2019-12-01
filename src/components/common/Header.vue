@@ -24,8 +24,11 @@
         </div>-->
         <!-- 用户头像 -->
         <div class="user-avator">
-          <img :src="baseUrl + this.$store.state.user.headUrl" v-if="this.$store.state.user.headUrl">
-					<img v-else src="../../assets/img/img.jpg" alt="">
+          <img
+            :src="baseUrl + this.$store.state.user.headUrl"
+            v-if="this.$store.state.user.headUrl"
+          />
+          <img v-else src="../../assets/img/img.jpg" alt />
         </div>
         <!-- 用户名下拉菜单 -->
         <el-dropdown class="user-name" trigger="click" @command="handleCommand">
@@ -51,7 +54,7 @@
           name="img"
           :on-success="handleAvatarSuccess"
         >
-          <img v-if="info.headUrl" :src="baseUrl + info.headUrl" class="avatar">
+          <img v-if="info.headUrl" :src="baseUrl + info.headUrl" class="avatar" />
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
         <el-form-item label="用户名" prop="username">
@@ -108,8 +111,8 @@ export default {
       isPwd: false,
       pwd: {},
       baseUrl: config.baseUrl,
-			upImgageUrl: config.baseUrl + "/api/upImage",
-			error: '',
+      upImgageUrl: config.baseUrl + "/api/upImage",
+      error: "",
       rules: {
         oldpwd: [{ required: true, message: "请输入旧密码", trigger: "blur" }],
         newpwd: [{ required: true, message: "请输入新密码", trigger: "blur" }],
@@ -119,15 +122,15 @@ export default {
   },
   created() {
     http.login({}).then(res => {
-      this.info = res.data;
+      this.info = res.data.data;
     });
   },
   methods: {
-		inputPwd() {
-			if(this.pwd.newpwd !== this.pwd.respwd) {
-				this.error = "两次密码不一致！";
-			}
-		},
+    inputPwd() {
+      if (this.pwd.newpwd !== this.pwd.respwd) {
+        this.error = "两次密码不一致！";
+      }
+    },
     editPwd(formName) {
       const that = this;
       this.$refs[formName].validate(valid => {
@@ -137,44 +140,30 @@ export default {
             oldpwd: that.pwd.oldpwd,
             id: that.info.id
           };
-          that.edit(param);
+          that.edit(param, "editPwd");
         }
       });
     },
     editInfo() {
       this.edit(this.info);
     },
-    edit(param) {
-      http
-        .saveUser(param)
-        .then(res => {
-          if (res.data.original && res.data.original.updated) {
-            this.isShow = false;
-            this.isPwd = false;
-            // this.$store.state.user.headUrl = this.info.headUrl;
-            this.$store.commit('setHeadUrl', this.info.headUrl);
-            this.$message.success("修改成功！");
-          } else if (res.data.original && res.data.original.find) {
-            this.$message.error(res.data.original.message);
-          } else if (res.data.original && res.data.original.updatepwd) {
-						this.$message.success("修改成功！");
-						this.clear();
-          } else {
-            this.$message.error("修改失败！");
-          }
-        })
-        .catch(res => {});
+    edit(param, editPwd = "") {
+      http.saveUser(param).then(res => {
+        this.isShow = false;
+        this.isPwd = false;
+        this.$message.success(res.data.stateMsg);
+        if (editPwd === "editPwd") {
+          this.clear();
+        }
+      });
     },
     clear() {
       this.$cookies.remove("access_token");
-      this.$cookies.remove("token_type");
-      this.$cookies.remove("headUrl");
-      this.$cookies.remove("username");
       this.$router.push("/login");
     },
     handleAvatarSuccess(res, file) {
-      if (res.res) {
-        this.info.headUrl =  res.url;
+      if (res.code * 1 === 200) {
+        this.info.headUrl = res.data;
       } else {
         this.$message.error("上传失败！");
       }

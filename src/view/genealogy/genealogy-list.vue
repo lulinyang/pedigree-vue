@@ -39,7 +39,7 @@
         </el-table-column>
         <el-table-column prop="username" label="创建人"></el-table-column>
         <el-table-column prop="created_at" label="创建时间"></el-table-column>
-        <el-table-column prop="updated_at" label="更新时间"></el-table-column>
+        <!-- <el-table-column prop="updated_at" label="更新时间"></el-table-column> -->
 
         <el-table-column label="操作" width="300" align="center">
           <template slot-scope="scope">

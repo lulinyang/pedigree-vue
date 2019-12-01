@@ -1,42 +1,24 @@
 <template>
   <el-card class="box-card box-card-home">
-    <el-row>
+    <el-row >
       <el-col :span="8">
         <div class="grid-content-left">
           <img width="100%" src="static/imgs/phone-header.jpg" class="phone-header" />
           <div class="mobile-box">
             <el-carousel height="190px" arrow="never">
-              <el-carousel-item v-for="item in 4" :key="item">
+              <el-carousel-item v-for="(item, index) in banners" :key="index">
                 <img
                   width="100%"
                   height="100%"
-                  src="https://lulinyang.oss-cn-beijing.aliyuncs.com/20190726/156413350839204345.jpg"
+                  :src="$host + item.imgUrl"
                 />
               </el-carousel-item>
             </el-carousel>
-            <el-row>
-              <el-col :span="6">
+            <el-row style="background:#fff;">
+              <el-col :span="6" v-for="(item, index) in menus" :key="index">
                 <div class="grid-menu">
-                  <img width="60px" height="60px" src="static/imgs/home_menu1.png" />
-                  <p>宗祠</p>
-                </div>
-              </el-col>
-              <el-col :span="6">
-                <div class="grid-menu">
-                  <img width="60px" height="60px" src="static/imgs/home_menu3.png" />
-                  <p>历史今日</p>
-                </div>
-              </el-col>
-              <el-col :span="6">
-                <div class="grid-menu">
-                  <img width="60px" height="60px" src="static/imgs/home_menu5.png" />
-                  <p>老黄历</p>
-                </div>
-              </el-col>
-              <el-col :span="6">
-                <div class="grid-menu">
-                  <img width="60px" height="60px" src="static/imgs/home_menu6.png" />
-                  <p>名人烈士</p>
+                  <img width="60px" height="60px" :src="$host + item.icon" />
+                  <p>{{item.name}}</p>
                 </div>
               </el-col>
             </el-row>
@@ -151,19 +133,31 @@
             <el-table :data="banners" style="width: 100%">
               <el-table-column label="轮播图">
                 <template slot-scope="scope">
-                  <img :src="scope.row.imgUrl" width="100px" height="70px" />
+                  <el-upload
+                    class="avatar-uploader"
+                    :action="upImgageUrl"
+                    :show-file-list="false"
+                    :on-success="(res, file) => handleBannerSuccess(res, file, scope.row)"
+                    name="img"
+                  >
+                    <img v-if="scope.row.imgUrl" :src="$host + scope.row.imgUrl" class="avatar" />
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                  </el-upload>
+                  <!-- <el-upload>
+                    <img :src="scope.row.imgUrl" width="100px" height="70px" />
+                  </el-upload>-->
                 </template>
               </el-table-column>
               <el-table-column label="是否链接" align="center">
                 <template slot-scope="scope">
-                  <el-switch v-model="scope.row.isLink"></el-switch>
+                  <el-switch v-model="scope.row.islink"></el-switch>
                 </template>
               </el-table-column>
               <el-table-column prop="link" label="链接地址">
                 <template slot-scope="scope">
                   <el-input
                     v-model="scope.row.link"
-                    :disabled="scope.row.isLink*1 === 0"
+                    :disabled="scope.row.islink*1 === 0"
                     placeholder="请输入外部链接"
                   ></el-input>
                 </template>
@@ -171,6 +165,11 @@
               <el-table-column label="是否禁用" align="center">
                 <template slot-scope="scope">
                   <el-switch v-model="scope.row.isDeleted"></el-switch>
+                </template>
+              </el-table-column>
+              <el-table-column label="删除" align="center">
+                <template slot-scope="scope">
+                  <el-button type="danger" @click="delBannerItem(scope.$index)">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -184,7 +183,7 @@
                 <span>首页菜单</span>
               </el-col>
               <el-col :span="12" style="text-align: right;">
-                <el-button style type="primary" @click="addMenuItem()" plain>添加菜单</el-button>
+                <!-- <el-button style type="primary" @click="addMenuItem()" plain>添加菜单</el-button> -->
                 <el-button style="margin-left: 20px;" type="primary" @click="saveMenu()">保存</el-button>
               </el-col>
             </el-row>
@@ -193,20 +192,39 @@
             <el-table :data="menus" style="width: 100%">
               <el-table-column label="图标">
                 <template slot-scope="scope">
-                  <img :src="scope.row.icon" width="70px" height="70px" class="img_icon"/>
+                  <el-upload
+                    class="icon-uploader"
+                    :action="upImgageUrl"
+                    :show-file-list="false"
+                    :on-success="(res, file) => handleMenuSuccess(res, file, scope.row)"
+                    name="img"
+                  >
+                    <img v-if="scope.row.icon" :src="$host + scope.row.icon" class="icon" />
+                    <i v-else class="el-icon-plus icon-uploader-icon"></i>
+                  </el-upload>
                 </template>
               </el-table-column>
 
-              <el-table-column prop="link" label="名称">
+              <el-table-column label="名称">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.name" placeholder="请输入外部链接"></el-input>
+                  <el-input v-model="scope.row.name" placeholder="请输入名称"></el-input>
                 </template>
               </el-table-column>
-              <el-table-column label="是否禁用" align="center">
+              <!-- <el-table-column label="路由">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.router" placeholder="请输入路由"></el-input>
+                </template>
+              </el-table-column> -->
+              <!-- <el-table-column label="是否禁用" align="center">
                 <template slot-scope="scope">
                   <el-switch v-model="scope.row.isDeleted"></el-switch>
                 </template>
-              </el-table-column>
+              </el-table-column> -->
+              <!-- <el-table-column label="删除" align="center">
+                <template slot-scope="scope">
+                  <el-button type="danger" @click="delMenuItem(scope.$index)">删除</el-button>
+                </template>
+              </el-table-column> -->
             </el-table>
           </template>
         </el-card>
@@ -216,63 +234,107 @@
 </template>
 
 <script>
+import config from "@/config/index";
+import http from "@/http/server/api";
 export default {
   data() {
     return {
+      upImgageUrl: config.baseUrl + "/api/upImage",
       activeName: "0",
-      banners: [
-        {
-          imgUrl:
-            "https://lulinyang.oss-cn-beijing.aliyuncs.com/20190726/156413350839204345.jpg",
-          isLink: true,
-          link: "http://www.baidu.com",
-          isDeleted: false
-        },
-        {
-          imgUrl:
-            "https://lulinyang.oss-cn-beijing.aliyuncs.com/20190726/156413350839204345.jpg",
-          isLink: true,
-          link: "http://www.baidu.com",
-          isDeleted: false
-        },
-        {
-          imgUrl:
-            "https://lulinyang.oss-cn-beijing.aliyuncs.com/20190726/156413350839204345.jpg",
-          isLink: true,
-          link: "http://www.baidu.com",
-          isDeleted: false
-        }
-      ],
-      menus: [
-        {
-          icon:
-            "https://lulinyang.oss-cn-beijing.aliyuncs.com/20190726/156413350839204345.jpg",
-          name: "宗祠",
-          isDeleted: false
-        }
-      ]
+      banners: [],
+      menus: []
     };
   },
+  created() {
+    this.getBanner();
+    this.getMenu();
+  },
+
   methods: {
+    delBannerItem(index) {
+      this.banners.splice(index, 1);
+    },
+    delMenuItem(index) {
+      this.menus.splice(index, 1);
+    },
+    handleBannerSuccess(res, file, item) {
+      if (res.code * 1 === 200) {
+        item.imgUrl = res.data;
+      }
+    },
+    handleMenuSuccess(res, file, item) {
+      if (res.code * 1 === 200) {
+        item.icon = res.data;
+      }
+    },
+    getBanner() {
+      http.getBanner({}).then(res => {
+        this.banners = res.data.data.map(item => {
+          item.islink = item.isLink * 1 === 1 ? true : false;
+          item.isDeleted = item.deleted * 1 === 1 ? true : false;
+          return item;
+        });
+      });
+    },
+    getMenu() {
+      http.getMenu({}).then(res => {
+        this.menus = res.data.data.map(item => {
+          item.isDeleted = item.deleted * 1 === 1 ? true : false;
+          return item;
+        });
+      });
+    },
     addBannerItem() {
       this.banners.push({
         imgUrl:
-          "https://lulinyang.oss-cn-beijing.aliyuncs.com/20190726/156413350839204345.jpg",
-        isLink: false,
-        link: "http://www.baidu.com",
-        isDeleted: true
-      });
-    },
-    addMenuItem() {
-      this.menus.push({
-        icon:
-          "https://lulinyang.oss-cn-beijing.aliyuncs.com/20190726/156413350839204345.jpg",
-        name: "宗祠",
+          "/uploads/20191126/RMvbVmqOOg92zNaWVnagg2NHsXMKJnPQtXFhWoAY.png",
+        islink: false,
+        link: "",
         isDeleted: false
       });
     },
-    saveBanner() {},
-    saveMenu() {}
+    addMenuItem() {
+      if (this.banners.length >= 4) {
+        this.$message.warning("最多添加四个");
+        return false;
+      }
+      this.menus.push({
+        icon: "/uploads/20191126/3kHYMDNVrX9m6xQtohRokltHghLkpJLaotW707SZ.png",
+        name: "",
+        isDeleted: false,
+        router: ""
+      });
+    },
+    saveBanner() {
+      const params = {};
+      let arr = [];
+      this.banners.forEach(item => {
+        item.deleted = item.isDeleted ? 1 : 0;
+        item.isLink = item.islink ? 1 : 0;
+        arr.push(item);
+      });
+      params.banners = arr;
+
+      http.addBanner(params).then(res => {
+        if (res.data.code * 1 === 200) {
+          this.$message.success(res.data.stateMsg);
+        }
+      });
+    },
+    saveMenu() {
+      const params = {};
+      let arr = [];
+      this.menus.forEach(item => {
+        item.deleted = item.isDeleted ? 1 : 0;
+        arr.push(item);
+      });
+      params.menus = arr;
+      http.addMenu(params).then(res => {
+        if (res.data.code * 1 === 200) {
+          this.$message.success(res.data.stateMsg);
+        }
+      });
+    }
   }
 };
 </script>
@@ -373,5 +435,62 @@ export default {
 }
 .img_icon {
   border-radius: 50%;
+}
+
+.avatar-uploader .el-upload {
+  /* border: 1px dashed #d9d9d9; */
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 0;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 100px;
+  height: 70px;
+  line-height: 70px;
+  text-align: center;
+}
+.avatar {
+  width: 100px;
+  height: 70px;
+  display: block;
+}
+
+.icon-uploader .el-upload {
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 0;
+}
+
+.icon-uploader .el-upload:hover {
+  border-color: #409eff;
+  border-radius: 50%;
+}
+.icon-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  text-align: center;
+}
+.icon {
+  width: 70px;
+  height: 70px;
+  display: block;
+}
+</style>
+
+<style>
+.el-upload--text {
+  border: 0;
 }
 </style>

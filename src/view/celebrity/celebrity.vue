@@ -3,26 +3,11 @@
     <el-card class="box-card" style="width: 100%;">
       <div slot="header" class="clearfix">
         <el-form :inline="true" :model="keywords" class="demo-form-inline">
-          <el-form-item label="标题">
-            <el-input v-model="keywords.title" placeholder="请输入标题"></el-input>
+          <el-form-item label="姓名">
+            <el-input v-model="keywords.name" placeholder="请输入姓名"></el-input>
           </el-form-item>
-
-          <el-form-item label="栏目">
-            <el-select v-model="keywords.type" filterable placeholder="请选择栏目">
-              <el-option :value="''" :label="'全部'"></el-option>
-              <el-option
-                v-for="item in columnlist"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="描述">
-            <el-input v-model="keywords.describe" placeholder="请输入描述"></el-input>
-          </el-form-item>
-          <el-form-item label="创建人">
-            <el-input v-model="keywords.create_user" placeholder="请输入创建人"></el-input>
+          <el-form-item label="字">
+            <el-input v-model="keywords.name_word" placeholder="请输入字"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="search">查询</el-button>
@@ -32,22 +17,27 @@
       <el-row style="margin-bottom: 15px">
         <el-col :span="24">
           <div>
-            <el-button type="primary" icon="el-icon-plus" @click="jumpPage('add')">添加文章</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="jumpPage('/add-celebrity')">添加历史名人/烈士</el-button>
           </div>
         </el-col>
       </el-row>
       <div>
         <el-table :data="arcticleList" border style="width: 100%">
-          <el-table-column prop="title" label="标题" width="200"></el-table-column>
-          <el-table-column prop="typename" label="所属栏目"></el-table-column>
+          <el-table-column prop="name" label="姓名" ></el-table-column>
+          <el-table-column prop="name_word" label="字" ></el-table-column>
           <el-table-column label="缩略图" width="120">
             <template slot-scope="scope">
               <el-image :src="baseUrl + scope.row.thumbnail"></el-image>
             </template>
           </el-table-column>
-          <el-table-column prop="describe" label="描述" width="240">
+          <el-table-column prop="describe" label="描述" >
             <template slot-scope="scope">
               <p class="describe">{{scope.row.describe}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="tag" label="标签" width="180">
+            <template slot-scope="scope">
+              <p class="describe">{{scope.row.tag}}</p>
             </template>
           </el-table-column>
           <el-table-column prop="created_at" label="创建时间" width="180"></el-table-column>
@@ -57,10 +47,10 @@
                 type="primary"
                 icon="el-icon-edit"
                 circle
-                @click="jumpPage('edit',scope.row.id)"
+                @click="jumpPage(`/edit-celebrity/${scope.row.id}`)"
               ></el-button>
               <el-button type="danger" icon="el-icon-delete" circle @click="showDel(scope.row.id)"></el-button>
-              <el-button type="info" icon="el-icon-info" circle @click="showDetail(scope.row.id)"></el-button>
+              <!-- <el-button type="info" icon="el-icon-info" circle @click="jumpPage(`/celebrity-detail/${scope.row.id}`)"></el-button> -->
             </template>
           </el-table-column>
         </el-table>
@@ -100,18 +90,11 @@ export default {
     };
   },
   created() {
-    http.getColumnList({}).then(res => {
-      this.columnlist = res.data.data.data;
-    });
     this.getList();
   },
   methods: {
-    jumpPage(page, id = "") {
-      if (page === "add") {
-        this.$router.push("/article-add");
-      } else {
-        this.$router.push(`/article-edit/${id}`);
-      }
+    jumpPage(page) {
+      this.$router.push(page);
     },
     search() {
       this.getList();
@@ -119,12 +102,11 @@ export default {
     getList() {
       const that = this;
       http
-        .getArcticlList(this.keywords)
+        .getCelebrity(this.keywords)
         .then(res => {
           that.arcticleList = res.data.data.data;
           that.total = res.data.data.total;
         })
-        .catch(res => {});
     },
     changeCurrent(page) {
       this.keywords.page = page;
@@ -143,22 +125,18 @@ export default {
       })
         .then(() => {
           http
-            .deleteArcticle({ id: id })
+            .delCelebrity({ id: id })
             .then(res => {
               if (res.data.code == 200) {
                 this.$message.success("删除成功！");
                 that.getList();
               }
             })
-            .catch(res => {});
         })
         .catch(() => {
           this.$message.info("已取消删除!");
         });
     },
-    showDetail(id) {
-      this.$router.push(`/article-detail/${id}`);
-    }
   }
 };
 </script>

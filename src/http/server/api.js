@@ -3,8 +3,6 @@ import extendsApi from './extendsApi'
 class AllServiceApi extends extendsApi {
   constructor() {
     super()
-    // this.demoUrl = 'test.com';
-    // this.oauth = 'test.com/oauth/token'
   }
   //获取token
   getToken(params) {
@@ -22,10 +20,8 @@ class AllServiceApi extends extendsApi {
   login(params) {
     return this.sendPost('/api/getUserInfo', params);
   }
-
   //用户列表
   getUserList(params) {
-
     return this.sendGet('/api/getUserList', params);
   }
   //得到所有角色
@@ -163,6 +159,70 @@ class AllServiceApi extends extendsApi {
   //删除文章
   deleteArcticle(params) {
     return this.sendPost('/api/deleteArcticle', params);
+  }
+  //保存轮播图
+  addBanner(params) {
+    return this.sendPost('/api/addBanner', params);
+  }
+  //获取轮播图
+  getBanner(params) {
+    return this.sendGet('/api/getBanner', params);
+  }
+  //删除轮播图
+  delBanner(params) {
+    return this.sendPost('/api/delBanner', params);
+  }
+  //保存首页菜单
+  addMenu(params) {
+    return this.sendPost('/api/addMenu', params);
+  }
+  //获取首页菜单
+  getMenu(params) {
+    return this.sendGet('/api/getMenu', params);
+  }
+  //获取用户列表（移动端）
+  getUser(params) {
+    return this.sendGet('/api/getUser', params);
+  }
+  //根据用户名得到用户
+  getUserAll(params) {
+    return this.sendGet('/api/getUserAll', params);
+  }
+  //根据族谱名获取所有族谱
+  getSurnameAll(params) {
+    return this.sendGet('/api/getSurnameAll', params);
+  }
+  //添加宗祠
+  addAncestral(params) {
+    return this.sendPost('/api/addAncestral', params);
+  }
+  //宗祠列表
+  getAncestral(params) {
+    return this.sendGet('/api/getAncestral', params);
+  }
+  //根据ID获取宗祠
+  getAncestralById(params) {
+    return this.sendGet('/api/getAncestralById', params);
+  }
+  //删除宗祠
+  delAncestral(params) {
+    return this.sendPost('/api/delAncestral', params);
+  }
+  //添加历史名人/烈士
+  addCelebrity(params) {
+    return this.sendPost('/api/addCelebrity', params);
+  }
+  //获取历史名人/烈士
+  getCelebrity(params) {
+    return this.sendGet('/api/getCelebrity', params);
+  }
+  //根据ID获取历史名人/烈士
+  getCelebrityById(params) {
+    return this.sendGet('/api/getCelebrityById', params);
+  }
+  //删除历史名人/烈士
+  delCelebrity(params) {
+    return this.sendPost('/api/delCelebrity', params);
   }
 }
 

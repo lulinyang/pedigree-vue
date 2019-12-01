@@ -20,21 +20,23 @@ export default new Router({
 					component: resolve => require(['@/view/home.vue'], resolve),
 					meta: { title: '系统首页' }
 				},
+				//用户中心
 				{
-					path: '/user-list',
-					component: resolve => require(['@/view/users/user-list.vue'], resolve),
-					meta: { title: '用户管理' }
+					path: '/admin-list',
+					component: resolve => require(['@/view/admin/admin-list.vue'], resolve),
+					meta: { title: '管理员' }
 				},
 				{
 					path: '/role-list',
-					component: resolve => require(['@/view/users/role-list.vue'], resolve),
+					component: resolve => require(['@/view/admin/role-list.vue'], resolve),
 					meta: { title: '角色管理' }
 				},
 				{
 					path: '/power-list',
-					component: resolve => require(['@/view/users/power-list.vue'], resolve),
+					component: resolve => require(['@/view/admin/power-list.vue'], resolve),
 					meta: { title: '权限管理' }
 				},
+				//族谱管理
 				{
 					path: '/genealogy-list',
 					component: resolve => require(['@/view/genealogy/genealogy-list.vue'], resolve),
@@ -65,6 +67,7 @@ export default new Router({
 					component: resolve => require(['@/view/genealogy/pedigree-topology.vue'], resolve),
 					meta: { title: '族谱拓扑图' }
 				},
+				//成员管理
 				{
 					path: '/member-list',
 					component: resolve => require(['@/view/genealogy/member-list.vue'], resolve),
@@ -85,6 +88,7 @@ export default new Router({
 					component: resolve => require(['@/view/genealogy/member-detail.vue'], resolve),
 					meta: { title: '成员简介' }
 				},
+				//文章管理
 				{
 					path: '/column-list',
 					component: resolve => require(['@/view/article/column-list.vue'], resolve),
@@ -109,6 +113,48 @@ export default new Router({
 					path: '/article-detail/:id(\\d+)',
 					component: resolve => require(['@/view/article/article-detail.vue'], resolve),
 					meta: { title: '文章详情' }
+				},
+				{
+					path: '/celebrity',
+					component: resolve => require(['@/view/celebrity/celebrity.vue'], resolve),
+					meta: { title: '名人烈士' }
+				},
+				{
+					path: '/add-celebrity',
+					component: resolve => require(['@/view/celebrity/add-celebrity.vue'], resolve),
+					meta: { title: '添加历史名人/烈士' }
+				},
+				{
+					path: '/edit-celebrity/:id',
+					component: resolve => require(['@/view/celebrity/add-celebrity.vue'], resolve),
+					meta: { title: '编辑历史名人/烈士' }
+				},
+				{
+					path: '/celebrity-detail/:id',
+					component: resolve => require(['@/view/celebrity/celebrity-detail.vue'], resolve),
+					meta: { title: '历史名人/烈士详情' }
+				},
+				//用户管理
+				{
+					path: '/user-list',
+					component: resolve => require(['@/view/users/user-list.vue'], resolve),
+					meta: { title: '宗祠管理' }
+				},
+				//宗祠管理
+				{
+					path: '/ancestral-hall',
+					component: resolve => require(['@/view/ancestral/ancestral-hall.vue'], resolve),
+					meta: { title: '宗祠管理' }
+				},
+				{
+					path: '/add-ancestral-hall',
+					component: resolve => require(['@/view/ancestral/add-ancestral-hall.vue'], resolve),
+					meta: { title: '添加宗祠' }
+				},
+				{
+					path: '/edit-ancestral-hall/:id',
+					component: resolve => require(['@/view/ancestral/add-ancestral-hall.vue'], resolve),
+					meta: { title: '编辑宗祠' }
 				},
 				//基础设置
 				{
