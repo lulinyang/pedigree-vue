@@ -4,6 +4,26 @@
       <el-form-item label="区域姓氏" prop="area_surname" style="width: 700px;">
         <el-input v-model="genealogy.area_surname" style="width: 450px" placeholder="请输入区域姓氏"></el-input>
       </el-form-item>
+      <el-form-item label="管理员" prop="administrators">
+        <el-select
+          style="width: 450px"
+          v-model="genealogy.administrators"
+          multiple
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入手机号"
+          :remote-method="remoteMethod"
+          :loading="loading"
+        >
+          <el-option
+            v-for="item in users"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="缩略图">
         <el-upload
           :action="upImgageUrl"
@@ -13,7 +33,6 @@
           :on-success="handleAvatarSuccess"
           :limit="1"
           :on-exceed="errMessage"
-          :headers="headers"
           name="img"
         >
           <i class="el-icon-plus"></i>
@@ -54,18 +73,51 @@ export default {
       baseUrl: config.baseUrl,
       upImgageUrl: config.baseUrl + "/api/upImage",
       myConfig: editor.myConfig,
+      users: [],
+      loading: false,
       rules: {
-        area_surname: [{ required: true, message: "区域姓氏", trigger: "blur" }]
-      },
-      headers: {
-        "Authorization": this.$store.getters.token_type + ' ' + this.$store.getters.access_token
+        area_surname: [
+          { required: true, message: "区域姓氏", trigger: "blur" }
+        ],
+        administrators: [
+          {
+            required: true,
+            message: "管理员必填！",
+            trigger: ["blur", "change"]
+          }
+        ]
       },
       dialogImageUrl: "",
       dialogVisible: false
     };
   },
-  created() {},
+  created() {
+    const that = this;
+    http.getUserAll({}).then(res => {
+      that.users = [];
+      res.data.data.forEach(item => {
+        that.users.push({
+          label: `${item.name} (${item.username})`,
+          value: item.id.toString()
+        });
+      });
+    });
+  },
   methods: {
+    remoteMethod(query) {
+      const that = this;
+      this.loading = true;
+      http.getUserAll({ username: query }).then(res => {
+        this.loading = false;
+        that.users = [];
+        res.data.data.forEach(item => {
+          that.users.push({
+            label: `${item.name} (${item.username})`,
+            value: item.id.toString()
+          });
+        });
+      });
+    },
     ready(editorSetting) {
       // console.log("editorSetting", editorSetting);
     },
@@ -87,8 +139,8 @@ export default {
       this.dialogVisible = true;
     },
     handleAvatarSuccess(res, file) {
-      console.log(res,  res.data);
-      if (res.code *10/10 === 200) {
+      console.log(res, res.data);
+      if ((res.code * 10) / 10 === 200) {
         this.genealogy.thumbnail = res.data;
       }
     },

@@ -151,10 +151,21 @@ export default new Router({
 					component: resolve => require(['@/view/ancestral/add-ancestral-hall.vue'], resolve),
 					meta: { title: '添加宗祠' }
 				},
+				// notice-list
 				{
 					path: '/edit-ancestral-hall/:id',
 					component: resolve => require(['@/view/ancestral/add-ancestral-hall.vue'], resolve),
 					meta: { title: '编辑宗祠' }
+				},
+				{
+					path: '/notice-list',
+					component: resolve => require(['@/view/ancestral/notice-list.vue'], resolve),
+					meta: { title: '公告管理' }
+				},
+				{
+					path: '/topic-list',
+					component: resolve => require(['@/view/topic/topic-list.vue'], resolve),
+					meta: { title: '话题管理' }
 				},
 				//基础设置
 				{

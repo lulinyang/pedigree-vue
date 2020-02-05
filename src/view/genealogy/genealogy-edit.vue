@@ -4,11 +4,30 @@
       <el-form-item label="区域姓氏" prop="area_surname">
         <el-input v-model="genealogy.area_surname" style="width: 450px" placeholder="请输入区域姓氏"></el-input>
       </el-form-item>
+      <el-form-item label="管理员" prop="administrators">
+        <el-select
+          style="width: 450px"
+          v-model="genealogy.administrators"
+          multiple
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入手机号"
+          :remote-method="remoteMethod"
+          :loading="loading"
+        >
+          <el-option
+            v-for="item in users"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="缩略图">
         <el-upload
           class="avatar-uploader"
           name="img"
-          :headers="headers"
           :action="upImgageUrl"
           :show-file-list="false"
           :on-success="handleThumbnailSuccess"
@@ -55,16 +74,32 @@ export default {
       baseUrl: config.baseUrl,
       upImgageUrl: config.baseUrl + "/api/upImage",
       myConfig: editor.myConfig,
-      headers: {
-        "Authorization": this.$store.getters.token_type + ' ' + this.$store.getters.access_token
-      },
+      users: [],
+      loading: false,
       rules: {
-        area_surname: [{ required: true, message: "区域姓氏", trigger: "blur" }]
+        area_surname: [{ required: true, message: "区域姓氏", trigger: "blur" }],
+        administrators: [
+          {
+            required: true,
+            message: "管理员必填！",
+            trigger: ["blur", "change"]
+          }
+        ],
       }
     };
   },
   created() {
     this.id = this.$route.params.id;
+     const that = this;
+    http.getUserAll({}).then(res => {
+      that.users = [];
+      res.data.data.forEach(item => {
+        that.users.push({
+          label: `${item.name} (${item.username})`,
+          value: item.id.toString()
+        });
+      });
+    });
     http.getGenealogy({ id: this.$route.params.id }).then(res => {
       if (res.data.data.thumbnail) {
         this.isShowImg = false;
@@ -77,6 +112,20 @@ export default {
     });
   },
   methods: {
+    remoteMethod(query) {
+      const that = this;
+      this.loading = true;
+      http.getUserAll({ username: query }).then(res => {
+        this.loading = false;
+        that.users = [];
+        res.data.data.forEach(item => {
+          that.users.push({
+            label: `${item.name} (${item.username})`,
+            value: item.id.toString()
+          });
+        });
+      });
+    },
     ready(editorSetting) {
       // console.log("editorSetting", editorSetting);
     },

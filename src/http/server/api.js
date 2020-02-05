@@ -224,6 +224,34 @@ class AllServiceApi extends extendsApi {
   delCelebrity(params) {
     return this.sendPost('/api/delCelebrity', params);
   }
+  //得到全部宗祠
+  getAncestralAll(params) {
+    return this.sendGet('/api/getAncestralAll', params);
+  }
+  //添加公告
+  addNotice(params) {
+    return this.sendPost('/api/addNotice', params);
+  }
+  //公告列表
+  getNoticeList(params) {
+    return this.sendGet('/api/getNoticeList', params);
+  }
+  //编辑公告
+  editNotice(params) {
+    return this.sendPost('/api/editNotice', params);
+  }
+  //删除公告
+  delNotice(params) {
+    return this.sendPost('/api/delNotice', params);
+  }
+  //得到话题列表
+  getConversationList(params) {
+    return this.sendGet('/api/getConversationList', params);
+  }
+  //删除话题
+  delConversationList(params) {
+    return this.sendPost('/api/delConversationList', params);
+  }
 }
 
 export default new AllServiceApi()
